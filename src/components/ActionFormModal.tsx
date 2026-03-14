@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Plus, Check } from 'lucide-react';
+import { X } from 'lucide-react';
 import { useAppStore } from '../stores/appStore';
 import type { ClickAction } from '../types';
 
@@ -16,13 +16,24 @@ export const ActionFormModal: React.FC<ActionFormModalProps> = ({
 }) => {
   const { categories, tags, addClickAction, updateClickAction } = useAppStore();
   
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    name: string;
+    actionType: 'open_app' | 'execute_script' | 'other';
+    actionValue: string;
+    icon: string;
+    categoryId: string;
+    tagIds: string[];
+    description: string;
+    displayInGallery: boolean;
+    displayInMenu: boolean;
+    displayInCLI: boolean;
+  }>({
     name: '',
-    actionType: 'open_app' as const,
+    actionType: 'open_app',
     actionValue: '',
     icon: '',
     categoryId: categories[0]?.id || '',
-    tagIds: [] as string[],
+    tagIds: [],
     description: '',
     displayInGallery: true,
     displayInMenu: true,

@@ -1,6 +1,6 @@
 import React from 'react';
 import { 
-  LayoutGrid, List, Search, Play, MoreVertical, 
+  LayoutGrid, List, Search, Play, 
   Edit2, Trash2, ExternalLink, Terminal
 } from 'lucide-react';
 import { useAppStore } from '../stores/appStore';

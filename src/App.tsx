@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Sidebar } from './components/Sidebar';
 import { ActionList } from './components/ActionList';
 import { ActionFormModal } from './components/ActionFormModal';
 import { CategoryTagManager } from './components/CategoryTagManager';
+import { useAppStore } from './stores/appStore';
 import type { ClickAction } from './types';
 
 function App() {
@@ -10,6 +11,13 @@ function App() {
   const [editingAction, setEditingAction] = useState<ClickAction | null>(null);
   const [isManagerOpen, setIsManagerOpen] = useState(false);
   const [managerTab, setManagerTab] = useState<'categories' | 'tags'>('categories');
+  
+  const initializeStore = useAppStore((state) => state.initializeStore);
+  const isLoading = useAppStore((state) => state.isLoading);
+
+  useEffect(() => {
+    initializeStore();
+  }, [initializeStore]);
 
   const handleAddClick = () => {
     setEditingAction(null);
@@ -34,6 +42,27 @@ function App() {
   const handleCloseManager = () => {
     setIsManagerOpen(false);
   };
+
+  if (isLoading) {
+    return (
+      <div className="app loading">
+        <div className="loading-spinner">加载中...</div>
+        <style>{`
+          .app.loading {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f5f5f5;
+          }
+          .loading-spinner {
+            font-size: 16px;
+            color: #666;
+          }
+        `}</style>
+      </div>
+    );
+  }
 
   return (
     <div className="app">
