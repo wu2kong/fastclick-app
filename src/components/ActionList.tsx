@@ -255,6 +255,7 @@ export const ActionList: React.FC<ActionListProps> = ({ onEdit }) => {
           justify-content: center;
           color: #2563eb;
           flex-shrink: 0;
+          padding: 6px;
         }
         .card-content {
           flex: 1;
@@ -331,6 +332,7 @@ export const ActionList: React.FC<ActionListProps> = ({ onEdit }) => {
           gap: 8px;
           font-size: 11px;
           color: #9ca3af;
+          margin-top: 4px;
         }
         .category {
           background: #f3f4f6;

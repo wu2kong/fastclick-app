@@ -278,7 +278,9 @@ export const ActionFormModal: React.FC<ActionFormModalProps> = ({
           max-width: 560px;
           max-height: 90vh;
           overflow-y: auto;
+          overflow-x: hidden;
           box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
+          box-sizing: border-box;
         }
         .modal-header {
           display: flex;
@@ -306,16 +308,24 @@ export const ActionFormModal: React.FC<ActionFormModalProps> = ({
         }
         form {
           padding: 24px;
+          box-sizing: border-box;
         }
         .form-group {
           margin-bottom: 20px;
+          min-width: 0;
         }
         .form-row {
           display: flex;
           gap: 16px;
+          min-width: 0;
+        }
+        .form-row .form-group:first-child {
+          flex-shrink: 0;
+          min-width: 140px;
         }
         .flex-1 {
           flex: 1;
+          min-width: 0;
         }
         label {
           display: block;
@@ -333,6 +343,7 @@ export const ActionFormModal: React.FC<ActionFormModalProps> = ({
           color: #374151;
           background: #ffffff;
           transition: border-color 0.15s;
+          box-sizing: border-box;
         }
         input:focus, select:focus, textarea:focus {
           outline: none;
@@ -347,6 +358,7 @@ export const ActionFormModal: React.FC<ActionFormModalProps> = ({
           display: flex;
           flex-wrap: wrap;
           gap: 8px;
+          min-width: 0;
         }
         .tag-option {
           padding: 6px 12px;
@@ -364,6 +376,7 @@ export const ActionFormModal: React.FC<ActionFormModalProps> = ({
           display: flex;
           flex-direction: column;
           gap: 10px;
+          min-width: 0;
         }
         .checkbox-label {
           display: flex;
@@ -374,6 +387,7 @@ export const ActionFormModal: React.FC<ActionFormModalProps> = ({
           color: #374151;
           cursor: pointer;
           margin: 0;
+          min-width: 0;
         }
         .checkbox-label input {
           width: auto;
