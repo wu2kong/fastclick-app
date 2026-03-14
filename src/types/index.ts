@@ -24,6 +24,7 @@ export interface Category {
   name: string;
   description: string;
   icon?: string;
+  order: number;
   createdAt: number;
 }
 
@@ -33,6 +34,7 @@ export interface Tag {
   parentId: string | null;
   description: string;
   color: string;
+  order: number;
   createdAt: number;
 }
 

@@ -29,6 +29,8 @@ interface AppState {
   addTag: (tag: Omit<Tag, 'id' | 'createdAt'>) => void;
   updateTag: (id: string, tag: Partial<Tag>) => void;
   deleteTag: (id: string) => void;
+  reorderCategories: (fromIndex: number, toIndex: number) => void;
+  reorderTags: (fromIndex: number, toIndex: number) => void;
   
   setSelectedCategory: (id: string | null) => void;
   setSelectedTag: (id: string | null) => void;
@@ -112,6 +114,7 @@ export const useAppStore = create<AppState>((set, get) => ({
       ...category,
       id: generateId(),
       createdAt: Date.now(),
+      order: category.order ?? get().categories.length,
     };
     set((state) => ({ categories: [...state.categories, newCategory] }));
     setTimeout(() => get().saveToStorage(), 0);
@@ -144,6 +147,7 @@ export const useAppStore = create<AppState>((set, get) => ({
       ...tag,
       id: generateId(),
       createdAt: Date.now(),
+      order: tag.order ?? get().tags.filter(t => t.parentId === tag.parentId).length,
     };
     set((state) => ({ tags: [...state.tags, newTag] }));
     setTimeout(() => get().saveToStorage(), 0);
@@ -164,6 +168,34 @@ export const useAppStore = create<AppState>((set, get) => ({
         tagIds: a.tagIds.filter((tid) => tid !== id),
       })),
     }));
+    setTimeout(() => get().saveToStorage(), 0);
+  },
+
+  reorderCategories: (fromIndex, toIndex) => {
+    set((state) => {
+      const sortedCategories = [...state.categories].sort((a, b) => a.order - b.order);
+      const [movedItem] = sortedCategories.splice(fromIndex, 1);
+      sortedCategories.splice(toIndex, 0, movedItem);
+      const updatedCategories = sortedCategories.map((cat, index) => ({
+        ...cat,
+        order: index,
+      }));
+      return { categories: updatedCategories };
+    });
+    setTimeout(() => get().saveToStorage(), 0);
+  },
+
+  reorderTags: (fromIndex, toIndex) => {
+    set((state) => {
+      const sortedTags = [...state.tags].sort((a, b) => a.order - b.order);
+      const [movedItem] = sortedTags.splice(fromIndex, 1);
+      sortedTags.splice(toIndex, 0, movedItem);
+      const updatedTags = sortedTags.map((tag, index) => ({
+        ...tag,
+        order: index,
+      }));
+      return { tags: updatedTags };
+    });
     setTimeout(() => get().saveToStorage(), 0);
   },
 
@@ -226,11 +258,15 @@ export const useAppStore = create<AppState>((set, get) => ({
     
     const addTagWithLevel = (tag: Tag, level: number) => {
       result.push({ tag, level });
-      const children = tags.filter((t) => t.parentId === tag.id);
+      const children = tags
+        .filter((t) => t.parentId === tag.id)
+        .sort((a, b) => a.order - b.order);
       children.forEach((child) => addTagWithLevel(child, level + 1));
     };
     
-    const rootTags = tags.filter((t) => t.parentId === null);
+    const rootTags = tags
+      .filter((t) => t.parentId === null)
+      .sort((a, b) => a.order - b.order);
     rootTags.forEach((tag) => addTagWithLevel(tag, 0));
     
     return result;

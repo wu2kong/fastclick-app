@@ -132,7 +132,7 @@ export const CategoryTagManager: React.FC<CategoryTagManagerProps> = ({
       if (formData.id) {
         updateCategory(formData.id, data);
       } else {
-        addCategory(data);
+        addCategory({ ...data, order: categories.length });
       }
     } else {
       const data = {
@@ -145,7 +145,7 @@ export const CategoryTagManager: React.FC<CategoryTagManagerProps> = ({
       if (formData.id) {
         updateTag(formData.id, data);
       } else {
-        addTag(data);
+        addTag({ ...data, order: tags.filter(t => t.parentId === formData.parentId).length });
       }
     }
     

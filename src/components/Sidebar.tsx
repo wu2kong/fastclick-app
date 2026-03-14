@@ -4,11 +4,55 @@ import {
   Menu, X
 } from 'lucide-react';
 import { useAppStore } from '../stores/appStore';
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 
 interface SidebarProps {
   onAddClick: () => void;
   onManageClick?: (tab: 'categories' | 'tags') => void;
 }
+
+interface SortableItemProps {
+  id: string;
+  children: React.ReactNode;
+}
+
+const SortableItem: React.FC<SortableItemProps> = ({ id, children }) => {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
+      {children}
+    </div>
+  );
+};
 
 export const Sidebar: React.FC<SidebarProps> = ({ onAddClick, onManageClick }) => {
   const {
@@ -23,10 +67,23 @@ export const Sidebar: React.FC<SidebarProps> = ({ onAddClick, onManageClick }) =
     getCategoryStats,
     getTagStats,
     getTagHierarchy,
+    reorderCategories,
+    reorderTags,
   } = useAppStore();
 
   const [expandedTags, setExpandedTags] = useState<Set<string>>(new Set());
   const tagHierarchy = getTagHierarchy();
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
 
   const toggleTagExpand = (tagId: string) => {
     setExpandedTags((prev) => {
@@ -39,6 +96,30 @@ export const Sidebar: React.FC<SidebarProps> = ({ onAddClick, onManageClick }) =
       return next;
     });
   };
+
+  const handleCategoryDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (over && active.id !== over.id) {
+      const sortedCategories = [...categories].sort((a, b) => a.order - b.order);
+      const oldIndex = sortedCategories.findIndex((c) => c.id === active.id);
+      const newIndex = sortedCategories.findIndex((c) => c.id === over.id);
+      reorderCategories(oldIndex, newIndex);
+    }
+  };
+
+  const handleTagDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (over && active.id !== over.id) {
+      const sortedTags = [...tags].sort((a, b) => a.order - b.order);
+      const oldIndex = sortedTags.findIndex((t) => t.id === active.id);
+      const newIndex = sortedTags.findIndex((t) => t.id === over.id);
+      reorderTags(oldIndex, newIndex);
+    }
+  };
+
+  const sortedCategories = [...categories].sort((a, b) => a.order - b.order);
 
   if (sidebarCollapsed) {
     return (
@@ -78,27 +159,40 @@ export const Sidebar: React.FC<SidebarProps> = ({ onAddClick, onManageClick }) =
               </button>
             )}
           </div>
-          <div className="section-items">
-            <div
-              className={`item ${!selectedCategoryId && !selectedTagId ? 'active' : ''}`}
-              onClick={() => {
-                setSelectedCategory(null);
-                setSelectedTag(null);
-              }}
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleCategoryDragEnd}
+          >
+            <SortableContext
+              items={sortedCategories.map((c) => c.id)}
+              strategy={verticalListSortingStrategy}
             >
-              <span>全部</span>
-            </div>
-            {categories.map((category) => (
-              <div
-                key={category.id}
-                className={`item ${selectedCategoryId === category.id ? 'active' : ''}`}
-                onClick={() => setSelectedCategory(category.id)}
-              >
-                <span>{category.name}</span>
-                <span className="count">{getCategoryStats(category.id)}</span>
+              <div className="section-items">
+                <div
+                  className={`item ${!selectedCategoryId && !selectedTagId ? 'active' : ''}`}
+                  onClick={() => {
+                    setSelectedCategory(null);
+                    setSelectedTag(null);
+                  }}
+                >
+                  <span>全部</span>
+                </div>
+                {sortedCategories.map((category) => (
+                  <SortableItem key={category.id} id={category.id}>
+                    <div
+                      className={`item sortable-item ${selectedCategoryId === category.id ? 'active' : ''}`}
+                      onClick={() => setSelectedCategory(category.id)}
+                    >
+                      <span className="drag-indicator" />
+                      <span className="item-name">{category.name}</span>
+                      <span className="count">{getCategoryStats(category.id)}</span>
+                    </div>
+                  </SortableItem>
+                ))}
               </div>
-            ))}
-          </div>
+            </SortableContext>
+          </DndContext>
         </div>
 
         {/* Tags Section */}
@@ -119,39 +213,52 @@ export const Sidebar: React.FC<SidebarProps> = ({ onAddClick, onManageClick }) =
               </button>
             )}
           </div>
-          <div className="section-items">
-            {tagHierarchy.map(({ tag, level }) => {
-              const hasChildren = tags.some((t) => t.parentId === tag.id);
-              const isExpanded = expandedTags.has(tag.id);
-              
-              return (
-                <div
-                  key={tag.id}
-                  className={`item tag-item ${selectedTagId === tag.id ? 'active' : ''}`}
-                  style={{ paddingLeft: `${16 + level * 16}px` }}
-                  onClick={() => setSelectedTag(tag.id)}
-                >
-                  {hasChildren && (
-                    <span
-                      className="expand-icon"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        toggleTagExpand(tag.id);
-                      }}
-                    >
-                      {isExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
-                    </span>
-                  )}
-                  <span 
-                    className="tag-dot"
-                    style={{ backgroundColor: tag.color }}
-                  />
-                  <span>{tag.name}</span>
-                  <span className="count">{getTagStats(tag.id)}</span>
-                </div>
-              );
-            })}
-          </div>
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleTagDragEnd}
+          >
+            <SortableContext
+              items={tagHierarchy.map(({ tag }) => tag.id)}
+              strategy={verticalListSortingStrategy}
+            >
+              <div className="section-items">
+                {tagHierarchy.map(({ tag, level }) => {
+                  const hasChildren = tags.some((t) => t.parentId === tag.id);
+                  const isExpanded = expandedTags.has(tag.id);
+                  
+                  return (
+                    <SortableItem key={tag.id} id={tag.id}>
+                      <div
+                        className={`item sortable-item tag-item ${selectedTagId === tag.id ? 'active' : ''}`}
+                        style={{ paddingLeft: `${16 + level * 16}px` }}
+                        onClick={() => setSelectedTag(tag.id)}
+                      >
+                        {hasChildren && (
+                          <span
+                            className="expand-icon"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              toggleTagExpand(tag.id);
+                            }}
+                          >
+                            {isExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+                          </span>
+                        )}
+                        <span className="drag-indicator" />
+                        <span 
+                          className="tag-dot"
+                          style={{ backgroundColor: tag.color }}
+                        />
+                        <span className="item-name">{tag.name}</span>
+                        <span className="count">{getTagStats(tag.id)}</span>
+                      </div>
+                    </SortableItem>
+                  );
+                })}
+              </div>
+            </SortableContext>
+          </DndContext>
         </div>
       </div>
 
@@ -266,6 +373,43 @@ export const Sidebar: React.FC<SidebarProps> = ({ onAddClick, onManageClick }) =
         .item.active {
           background: #eff6ff;
           color: #2563eb;
+        }
+        .sortable-item {
+          cursor: grab;
+          user-select: none;
+        }
+        .sortable-item:active {
+          cursor: grabbing;
+        }
+        .drag-indicator {
+          width: 12px;
+          height: 12px;
+          flex-shrink: 0;
+          opacity: 0;
+          transition: opacity 0.15s;
+        }
+        .sortable-item:hover .drag-indicator,
+        .sortable-item:active .drag-indicator {
+          opacity: 1;
+        }
+        .sortable-item .drag-indicator::before,
+        .sortable-item .drag-indicator::after {
+          content: '';
+          display: block;
+          height: 2px;
+          background: #9ca3af;
+          border-radius: 1px;
+          margin: 3px 0;
+        }
+        .sortable-item.active .drag-indicator::before,
+        .sortable-item.active .drag-indicator::after {
+          background: #93c5fd;
+        }
+        .item-name {
+          flex: 1;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
         }
         .tag-item {
           position: relative;

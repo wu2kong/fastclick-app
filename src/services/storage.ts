@@ -31,16 +31,16 @@ const defaultAppConfig: AppConfig = {
 };
 
 const defaultCategories: Category[] = [
-  { id: 'cat-1', name: '启动应用', description: '快速启动应用程序', icon: 'rocket', createdAt: Date.now() },
-  { id: 'cat-2', name: '执行脚本', description: '运行自定义脚本', icon: 'terminal', createdAt: Date.now() },
-  { id: 'cat-3', name: '执行操作', description: '执行系统操作', icon: 'zap', createdAt: Date.now() },
+  { id: 'cat-1', name: '启动应用', description: '快速启动应用程序', icon: 'rocket', order: 0, createdAt: Date.now() },
+  { id: 'cat-2', name: '执行脚本', description: '运行自定义脚本', icon: 'terminal', order: 1, createdAt: Date.now() },
+  { id: 'cat-3', name: '执行操作', description: '执行系统操作', icon: 'zap', order: 2, createdAt: Date.now() },
 ];
 
 const defaultTags: Tag[] = [
-  { id: 'tag-1', name: '工具', parentId: null, description: '实用工具', color: '#3b82f6', createdAt: Date.now() },
-  { id: 'tag-2', name: '开发', parentId: 'tag-1', description: '开发相关', color: '#10b981', createdAt: Date.now() },
-  { id: 'tag-3', name: 'App', parentId: null, description: '应用程序', color: '#f59e0b', createdAt: Date.now() },
-  { id: 'tag-4', name: '财经', parentId: null, description: '金融财经', color: '#ef4444', createdAt: Date.now() },
+  { id: 'tag-1', name: '工具', parentId: null, description: '实用工具', color: '#3b82f6', order: 0, createdAt: Date.now() },
+  { id: 'tag-2', name: '开发', parentId: 'tag-1', description: '开发相关', color: '#10b981', order: 0, createdAt: Date.now() },
+  { id: 'tag-3', name: 'App', parentId: null, description: '应用程序', color: '#f59e0b', order: 1, createdAt: Date.now() },
+  { id: 'tag-4', name: '财经', parentId: null, description: '金融财经', color: '#ef4444', order: 2, createdAt: Date.now() },
 ];
 
 const defaultActions: ClickAction[] = [
