@@ -17,6 +17,7 @@ export interface ClickAction {
   createdAt: number;
   updatedAt: number;
   executionCount: number;
+  order: number;
 }
 
 export interface Category {

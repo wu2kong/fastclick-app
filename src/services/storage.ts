@@ -58,6 +58,7 @@ const defaultActions: ClickAction[] = [
     createdAt: Date.now(),
     updatedAt: Date.now(),
     executionCount: 0,
+    order: 0,
   },
   {
     id: 'action-2',
@@ -73,6 +74,7 @@ const defaultActions: ClickAction[] = [
     createdAt: Date.now(),
     updatedAt: Date.now(),
     executionCount: 0,
+    order: 1,
   },
 ];
 
@@ -131,7 +133,12 @@ export const storage = {
   },
 
   async loadUserData(): Promise<UserData> {
-    return readJsonFile<UserData>(FILES.userData, { clickActions: defaultActions });
+    const data = await readJsonFile<UserData>(FILES.userData, { clickActions: defaultActions });
+    data.clickActions = data.clickActions.map((action, index) => ({
+      ...action,
+      order: action.order ?? index,
+    }));
+    return data;
   },
 
   async saveUserData(data: UserData): Promise<void> {

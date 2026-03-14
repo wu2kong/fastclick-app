@@ -15,7 +15,7 @@ interface AppState {
   isInitialized: boolean;
   
   setClickActions: (actions: ClickAction[]) => void;
-  addClickAction: (action: Omit<ClickAction, 'id' | 'createdAt' | 'updatedAt' | 'executionCount'>) => void;
+  addClickAction: (action: Omit<ClickAction, 'id' | 'createdAt' | 'updatedAt' | 'executionCount' | 'order'> & { order?: number }) => void;
   updateClickAction: (id: string, action: Partial<ClickAction>) => void;
   deleteClickAction: (id: string) => void;
   incrementExecutionCount: (id: string) => void;
@@ -31,6 +31,7 @@ interface AppState {
   deleteTag: (id: string) => void;
   reorderCategories: (fromIndex: number, toIndex: number) => void;
   reorderTags: (fromIndex: number, toIndex: number) => void;
+  reorderActions: (fromIndex: number, toIndex: number) => void;
   
   setSelectedCategory: (id: string | null) => void;
   setSelectedTag: (id: string | null) => void;
@@ -74,6 +75,7 @@ export const useAppStore = create<AppState>((set, get) => ({
       createdAt: Date.now(),
       updatedAt: Date.now(),
       executionCount: 0,
+      order: action.order ?? get().clickActions.length,
     };
     set((state) => ({ clickActions: [...state.clickActions, newAction] }));
     setTimeout(() => get().saveToStorage(), 0);
@@ -199,6 +201,20 @@ export const useAppStore = create<AppState>((set, get) => ({
     setTimeout(() => get().saveToStorage(), 0);
   },
 
+  reorderActions: (fromIndex, toIndex) => {
+    set((state) => {
+      const sortedActions = [...state.clickActions].sort((a, b) => a.order - b.order);
+      const [movedItem] = sortedActions.splice(fromIndex, 1);
+      sortedActions.splice(toIndex, 0, movedItem);
+      const updatedActions = sortedActions.map((action, index) => ({
+        ...action,
+        order: index,
+      }));
+      return { clickActions: updatedActions };
+    });
+    setTimeout(() => get().saveToStorage(), 0);
+  },
+
   setSelectedCategory: (id) => {
     set({ selectedCategoryId: id, selectedTagId: null });
     setTimeout(() => get().saveToStorage(), 0);
@@ -226,7 +242,7 @@ export const useAppStore = create<AppState>((set, get) => ({
 
   getFilteredActions: () => {
     const { clickActions, selectedCategoryId, selectedTagId, searchQuery } = get();
-    return clickActions.filter((action) => {
+    const filtered = clickActions.filter((action) => {
       if (selectedCategoryId && action.categoryId !== selectedCategoryId) return false;
       if (selectedTagId && !action.tagIds.includes(selectedTagId)) return false;
       if (searchQuery) {
@@ -238,6 +254,7 @@ export const useAppStore = create<AppState>((set, get) => ({
       }
       return true;
     });
+    return filtered.sort((a, b) => a.order - b.order);
   },
   
   getTagStats: (tagId) => {

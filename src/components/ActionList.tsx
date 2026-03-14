@@ -1,10 +1,27 @@
 import React, { useState } from 'react';
 import { 
   LayoutGrid, List, Search, Play, 
-  Edit2, Trash2, ExternalLink, Terminal, AlertTriangle
+  Edit2, Trash2, ExternalLink, Terminal, AlertTriangle, GripVertical
 } from 'lucide-react';
 import { useAppStore } from '../stores/appStore';
 import type { ClickAction } from '../types';
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+  horizontalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 
 interface ActionListProps {
   onEdit: (action: ClickAction) => void;
@@ -18,6 +35,88 @@ const getActionIcon = (type: string) => {
   }
 };
 
+interface SortableActionCardProps {
+  action: ClickAction;
+  onEdit: (action: ClickAction) => void;
+  onDelete: (action: ClickAction) => void;
+  onExecute: (action: ClickAction) => void;
+  getCategoryName: (categoryId: string) => string;
+  getTagNames: (tagIds: string[]) => string;
+}
+
+const SortableActionCard: React.FC<SortableActionCardProps> = ({
+  action,
+  onEdit,
+  onDelete,
+  onExecute,
+  getCategoryName,
+  getTagNames,
+}) => {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: action.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <div ref={setNodeRef} style={style} className="action-card sortable-action-card">
+      <div className="card-header">
+        <div className="drag-handle" {...attributes} {...listeners}>
+          <GripVertical size={16} />
+        </div>
+        <div className="icon-wrapper">
+          {getActionIcon(action.action.type)}
+        </div>
+        <div className="card-content">
+          <div className="card-title-row">
+            <h3>{action.name}</h3>
+            <div className="card-actions">
+              <button
+                className="execute-btn"
+                onClick={() => onExecute(action)}
+                title="执行"
+              >
+                <Play size={16} />
+              </button>
+              <button
+                className="edit-btn"
+                onClick={() => onEdit(action)}
+                title="编辑"
+              >
+                <Edit2 size={16} />
+              </button>
+              <button
+                className="delete-btn"
+                onClick={() => onDelete(action)}
+                title="删除"
+              >
+                <Trash2 size={16} />
+              </button>
+            </div>
+          </div>
+          <p className="description">{action.description || <em className="no-desc">无描述</em>}</p>
+          <div className="card-meta">
+            <span className="category">{getCategoryName(action.categoryId)}</span>
+            {action.tagIds.length > 0 && (
+              <span className="tags">{getTagNames(action.tagIds)}</span>
+            )}
+            <span className="stats">执行 {action.executionCount} 次</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 export const ActionList: React.FC<ActionListProps> = ({ onEdit }) => {
   const {
     viewMode,
@@ -29,6 +128,9 @@ export const ActionList: React.FC<ActionListProps> = ({ onEdit }) => {
     tags,
     incrementExecutionCount,
     deleteClickAction,
+    selectedCategoryId,
+    selectedTagId,
+    reorderActions,
   } = useAppStore();
 
   const [deleteConfirm, setDeleteConfirm] = useState<{ isOpen: boolean; action: ClickAction | null }>({
@@ -37,6 +139,18 @@ export const ActionList: React.FC<ActionListProps> = ({ onEdit }) => {
   });
 
   const filteredActions = getFilteredActions();
+  const canDragSort = !selectedCategoryId && !selectedTagId;
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
 
   const getCategoryName = (categoryId: string) => {
     return categories.find((c) => c.id === categoryId)?.name || '未分类';
@@ -54,9 +168,111 @@ export const ActionList: React.FC<ActionListProps> = ({ onEdit }) => {
     console.log('Executing:', action.action);
   };
 
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (over && active.id !== over.id) {
+      const sortedActions = [...filteredActions].sort((a, b) => a.order - b.order);
+      const oldIndex = sortedActions.findIndex((a) => a.id === active.id);
+      const newIndex = sortedActions.findIndex((a) => a.id === over.id);
+      reorderActions(oldIndex, newIndex);
+    }
+  };
+
+  const renderActionCard = (action: ClickAction) => {
+    if (canDragSort) {
+      return (
+        <SortableActionCard
+          key={action.id}
+          action={action}
+          onEdit={onEdit}
+          onDelete={(a) => setDeleteConfirm({ isOpen: true, action: a })}
+          onExecute={handleExecute}
+          getCategoryName={getCategoryName}
+          getTagNames={getTagNames}
+        />
+      );
+    }
+
+    return (
+      <div key={action.id} className="action-card">
+        <div className="card-header">
+          <div className="icon-wrapper">
+            {getActionIcon(action.action.type)}
+          </div>
+          <div className="card-content">
+            <div className="card-title-row">
+              <h3>{action.name}</h3>
+              <div className="card-actions">
+                <button
+                  className="execute-btn"
+                  onClick={() => handleExecute(action)}
+                  title="执行"
+                >
+                  <Play size={16} />
+                </button>
+                <button
+                  className="edit-btn"
+                  onClick={() => onEdit(action)}
+                  title="编辑"
+                >
+                  <Edit2 size={16} />
+                </button>
+                <button
+                  className="delete-btn"
+                  onClick={() => setDeleteConfirm({ isOpen: true, action })}
+                  title="删除"
+                >
+                  <Trash2 size={16} />
+                </button>
+              </div>
+            </div>
+            <p className="description">{action.description || <em className="no-desc">无描述</em>}</p>
+            <div className="card-meta">
+              <span className="category">{getCategoryName(action.categoryId)}</span>
+              {action.tagIds.length > 0 && (
+                <span className="tags">{getTagNames(action.tagIds)}</span>
+              )}
+              <span className="stats">执行 {action.executionCount} 次</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const renderContent = () => {
+    if (filteredActions.length === 0) {
+      return (
+        <div className="empty-state">
+          <p>没有找到小程序</p>
+          <p className="sub">点击左侧"添加小程序"按钮创建</p>
+        </div>
+      );
+    }
+
+    if (canDragSort) {
+      return (
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragEnd={handleDragEnd}
+        >
+          <SortableContext
+            items={filteredActions.map((a) => a.id)}
+            strategy={viewMode === 'grid' ? horizontalListSortingStrategy : verticalListSortingStrategy}
+          >
+            {filteredActions.map(renderActionCard)}
+          </SortableContext>
+        </DndContext>
+      );
+    }
+
+    return filteredActions.map(renderActionCard);
+  };
+
   return (
     <div className="action-list-container">
-      {/* Toolbar */}
       <div className="toolbar">
         <div className="search-box">
           <Search size={18} />
@@ -83,92 +299,40 @@ export const ActionList: React.FC<ActionListProps> = ({ onEdit }) => {
         </div>
       </div>
 
-      {/* Content */}
       <div className={`content ${viewMode}`}>
-        {filteredActions.length === 0 ? (
-          <div className="empty-state">
-            <p>没有找到小程序</p>
-            <p className="sub">点击左侧"添加小程序"按钮创建</p>
-          </div>
-        ) : (
-          filteredActions.map((action) => (
-            <div key={action.id} className="action-card">
-              <div className="card-header">
-                <div className="icon-wrapper">
-                  {getActionIcon(action.action.type)}
-                </div>
-                <div className="card-content">
-                  <div className="card-title-row">
-                    <h3>{action.name}</h3>
-                    <div className="card-actions">
-                      <button
-                        className="execute-btn"
-                        onClick={() => handleExecute(action)}
-                        title="执行"
-                      >
-                        <Play size={16} />
-                      </button>
-                      <button
-                        className="edit-btn"
-                        onClick={() => onEdit(action)}
-                        title="编辑"
-                      >
-                        <Edit2 size={16} />
-                      </button>
-                      <button
-                        className="delete-btn"
-                        onClick={() => setDeleteConfirm({ isOpen: true, action })}
-                        title="删除"
-                      >
-                        <Trash2 size={16} />
-                      </button>
-                    </div>
-                  </div>
-                  <p className="description">{action.description || <em className="no-desc">无描述</em>}</p>
-                  <div className="card-meta">
-                    <span className="category">{getCategoryName(action.categoryId)}</span>
-                    {action.tagIds.length > 0 && (
-                      <span className="tags">{getTagNames(action.tagIds)}</span>
-                    )}
-                    <span className="stats">执行 {action.executionCount} 次</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))
-        )}
+        {renderContent()}
       </div>
 
       {deleteConfirm.isOpen && deleteConfirm.action && (
-          <div className="delete-modal-overlay" onClick={() => setDeleteConfirm({ isOpen: false, action: null })}>
-            <div className="delete-modal" onClick={(e) => e.stopPropagation()}>
-              <div className="delete-modal-icon">
-                <AlertTriangle size={32} />
-              </div>
-              <h3>确认删除</h3>
-              <p>确定要删除 "{deleteConfirm.action.name}" 吗？此操作无法撤销。</p>
-              <div className="delete-modal-actions">
-                <button
-                  className="btn-cancel"
-                  onClick={() => setDeleteConfirm({ isOpen: false, action: null })}
-                >
-                  取消
-                </button>
-                <button
-                  className="btn-delete"
-                  onClick={() => {
-                    deleteClickAction(deleteConfirm.action!.id);
-                    setDeleteConfirm({ isOpen: false, action: null });
-                  }}
-                >
-                  删除
-                </button>
-              </div>
+        <div className="delete-modal-overlay" onClick={() => setDeleteConfirm({ isOpen: false, action: null })}>
+          <div className="delete-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="delete-modal-icon">
+              <AlertTriangle size={32} />
+            </div>
+            <h3>确认删除</h3>
+            <p>确定要删除 "{deleteConfirm.action.name}" 吗？此操作无法撤销。</p>
+            <div className="delete-modal-actions">
+              <button
+                className="btn-cancel"
+                onClick={() => setDeleteConfirm({ isOpen: false, action: null })}
+              >
+                取消
+              </button>
+              <button
+                className="btn-delete"
+                onClick={() => {
+                  deleteClickAction(deleteConfirm.action!.id);
+                  setDeleteConfirm({ isOpen: false, action: null });
+                }}
+              >
+                删除
+              </button>
             </div>
           </div>
-        )}
+        </div>
+      )}
 
-        <style>{`
+      <style>{`
         .action-list-container {
           flex: 1;
           display: flex;
@@ -269,6 +433,29 @@ export const ActionList: React.FC<ActionListProps> = ({ onEdit }) => {
         .action-card:hover {
           border-color: #d1d5db;
           box-shadow: 0 2px 4px -1px rgba(0,0,0,0.1);
+        }
+        .sortable-action-card {
+          cursor: grab;
+        }
+        .sortable-action-card:active {
+          cursor: grabbing;
+        }
+        .drag-handle {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: #d1d5db;
+          cursor: grab;
+          padding: 4px;
+          border-radius: 4px;
+          flex-shrink: 0;
+        }
+        .drag-handle:hover {
+          color: #9ca3af;
+          background: #f3f4f6;
+        }
+        .drag-handle:active {
+          cursor: grabbing;
         }
         .card-header {
           display: flex;
