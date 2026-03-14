@@ -92,49 +92,45 @@ export const ActionList: React.FC<ActionListProps> = ({ onEdit }) => {
                 <div className="icon-wrapper">
                   {getActionIcon(action.action.type)}
                 </div>
-                <div className="card-title">
-                  <h3>{action.name}</h3>
-                  <span className="category">{getCategoryName(action.categoryId)}</span>
-                </div>
-                <div className="card-actions">
-                  <button
-                    className="execute-btn"
-                    onClick={() => handleExecute(action)}
-                    title="执行"
-                  >
-                    <Play size={16} />
-                  </button>
-                  <button
-                    className="edit-btn"
-                    onClick={() => onEdit(action)}
-                    title="编辑"
-                  >
-                    <Edit2 size={16} />
-                  </button>
-                  <button
-                    className="delete-btn"
-                    onClick={() => {
-                      if (confirm('确定要删除这个小程序吗？')) {
-                        deleteClickAction(action.id);
-                      }
-                    }}
-                    title="删除"
-                  >
-                    <Trash2 size={16} />
-                  </button>
-                </div>
-              </div>
-              <p className="description">{action.description}</p>
-              <div className="card-footer">
-                <div className="tags">
-                  {action.tagIds.length > 0 ? (
-                    getTagNames(action.tagIds)
-                  ) : (
-                    <span className="no-tags">无标签</span>
-                  )}
-                </div>
-                <div className="stats">
-                  <span>执行 {action.executionCount} 次</span>
+                <div className="card-content">
+                  <div className="card-title-row">
+                    <h3>{action.name}</h3>
+                    <div className="card-actions">
+                      <button
+                        className="execute-btn"
+                        onClick={() => handleExecute(action)}
+                        title="执行"
+                      >
+                        <Play size={16} />
+                      </button>
+                      <button
+                        className="edit-btn"
+                        onClick={() => onEdit(action)}
+                        title="编辑"
+                      >
+                        <Edit2 size={16} />
+                      </button>
+                      <button
+                        className="delete-btn"
+                        onClick={() => {
+                          if (confirm('确定要删除这个小程序吗？')) {
+                            deleteClickAction(action.id);
+                          }
+                        }}
+                        title="删除"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
+                  </div>
+                  <p className="description">{action.description || <em className="no-desc">无描述</em>}</p>
+                  <div className="card-meta">
+                    <span className="category">{getCategoryName(action.categoryId)}</span>
+                    {action.tagIds.length > 0 && (
+                      <span className="tags">{getTagNames(action.tagIds)}</span>
+                    )}
+                    <span className="stats">执行 {action.executionCount} 次</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -235,53 +231,56 @@ export const ActionList: React.FC<ActionListProps> = ({ onEdit }) => {
         }
         .action-card {
           background: #ffffff;
-          border-radius: 12px;
-          padding: 16px;
+          border-radius: 10px;
+          padding: 12px;
           border: 1px solid #e5e7eb;
           transition: all 0.15s;
         }
         .action-card:hover {
           border-color: #d1d5db;
-          box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+          box-shadow: 0 2px 4px -1px rgba(0,0,0,0.1);
         }
         .card-header {
           display: flex;
           align-items: flex-start;
-          gap: 12px;
-          margin-bottom: 12px;
+          gap: 10px;
         }
         .icon-wrapper {
-          width: 40px;
-          height: 40px;
+          width: 36px;
+          height: 36px;
           background: #eff6ff;
-          border-radius: 10px;
+          border-radius: 8px;
           display: flex;
           align-items: center;
           justify-content: center;
           color: #2563eb;
           flex-shrink: 0;
         }
-        .card-title {
+        .card-content {
           flex: 1;
           min-width: 0;
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
         }
-        .card-title h3 {
+        .card-title-row {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 8px;
+        }
+        .card-title-row h3 {
           margin: 0;
-          font-size: 15px;
+          font-size: 14px;
           font-weight: 600;
           color: #111827;
           overflow: hidden;
           text-overflow: ellipsis;
           white-space: nowrap;
         }
-        .card-title .category {
-          font-size: 12px;
-          color: #6b7280;
-          margin-top: 2px;
-        }
         .card-actions {
           display: flex;
-          gap: 4px;
+          gap: 2px;
           opacity: 0;
           transition: opacity 0.15s;
         }
@@ -292,12 +291,12 @@ export const ActionList: React.FC<ActionListProps> = ({ onEdit }) => {
           display: flex;
           align-items: center;
           justify-content: center;
-          padding: 6px;
+          padding: 4px;
           border: none;
           background: transparent;
           cursor: pointer;
           border-radius: 4px;
-          color: #6b7280;
+          color: #9ca3af;
           transition: all 0.15s;
         }
         .card-actions button:hover {
@@ -313,30 +312,40 @@ export const ActionList: React.FC<ActionListProps> = ({ onEdit }) => {
           color: #dc2626;
         }
         .description {
-          font-size: 13px;
+          font-size: 12px;
           color: #6b7280;
-          margin: 0 0 12px 0;
-          line-height: 1.5;
+          margin: 0;
+          line-height: 1.4;
           display: -webkit-box;
-          -webkit-line-clamp: 2;
+          -webkit-line-clamp: 1;
           -webkit-box-orient: vertical;
           overflow: hidden;
+          font-style: italic;
         }
-        .card-footer {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          font-size: 12px;
+        .no-desc {
           color: #9ca3af;
         }
+        .card-meta {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          font-size: 11px;
+          color: #9ca3af;
+        }
+        .category {
+          background: #f3f4f6;
+          padding: 2px 6px;
+          border-radius: 4px;
+        }
         .tags {
-          max-width: 60%;
+          color: #9ca3af;
           overflow: hidden;
           text-overflow: ellipsis;
           white-space: nowrap;
         }
-        .no-tags {
-          color: #d1d5db;
+        .stats {
+          margin-left: auto;
+          flex-shrink: 0;
         }
       `}</style>
     </div>
