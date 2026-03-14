@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
 import { 
   Folder, Tag, ChevronRight, ChevronDown, Plus, 
-  LayoutGrid, List, Search, Menu, X
+  Menu, X
 } from 'lucide-react';
 import { useAppStore } from '../stores/appStore';
-import type { Category, Tag as TagType } from '../types';
 
 interface SidebarProps {
   onAddClick: () => void;
+  onManageClick?: (tab: 'categories' | 'tags') => void;
 }
 
-export const Sidebar: React.FC<SidebarProps> = ({ onAddClick }) => {
+export const Sidebar: React.FC<SidebarProps> = ({ onAddClick, onManageClick }) => {
   const {
     categories,
     tags,
@@ -65,6 +65,18 @@ export const Sidebar: React.FC<SidebarProps> = ({ onAddClick }) => {
           <div className="section-header">
             <Folder size={16} />
             <span>类别</span>
+            {onManageClick && (
+              <button
+                className="manage-btn"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onManageClick('categories');
+                }}
+                title="管理分类"
+              >
+                <Plus size={14} />
+              </button>
+            )}
           </div>
           <div className="section-items">
             <div
@@ -94,6 +106,18 @@ export const Sidebar: React.FC<SidebarProps> = ({ onAddClick }) => {
           <div className="section-header">
             <Tag size={16} />
             <span>标签</span>
+            {onManageClick && (
+              <button
+                className="manage-btn"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onManageClick('tags');
+                }}
+                title="管理标签"
+              >
+                <Plus size={14} />
+              </button>
+            )}
           </div>
           <div className="section-items">
             {tagHierarchy.map(({ tag, level }) => {
@@ -198,6 +222,28 @@ export const Sidebar: React.FC<SidebarProps> = ({ onAddClick }) => {
           font-weight: 600;
           color: #6b7280;
           text-transform: uppercase;
+          position: relative;
+        }
+        .manage-btn {
+          margin-left: auto;
+          background: none;
+          border: none;
+          cursor: pointer;
+          padding: 4px;
+          border-radius: 4px;
+          color: #9ca3af;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          opacity: 0;
+          transition: opacity 0.15s;
+        }
+        .section:hover .manage-btn {
+          opacity: 1;
+        }
+        .manage-btn:hover {
+          background: #e5e7eb;
+          color: #374151;
         }
         .section-items {
           display: flex;
