@@ -6,7 +6,7 @@ import {
 import { useAppStore } from '../stores/appStore';
 import type { ClickAction } from '../types';
 import { ExecuteModal } from './ExecuteModal';
-import { convertFileSrc } from '@tauri-apps/api/core';
+import { readFile } from '@tauri-apps/plugin-fs';
 import {
   DndContext,
   closestCenter,
@@ -29,18 +29,75 @@ interface ActionListProps {
   onEdit: (action: ClickAction) => void;
 }
 
-const getActionIcon = (action: ClickAction, size: number = 16) => {
+const iconCache = new Map<string, string>();
+
+const ActionIcon: React.FC<{ action: ClickAction; size: number }> = ({ action, size }) => {
+  const [blobUrl, setBlobUrl] = useState<string | null>(null);
+
+  const iconValue = action.icon?.value;
+  const isFilePath = iconValue && iconValue.startsWith('/');
+
+  useEffect(() => {
+    if (!isFilePath || !iconValue) return;
+
+    if (iconCache.has(iconValue)) {
+      setBlobUrl(iconCache.get(iconValue)!);
+      return;
+    }
+
+    let cancelled = false;
+    const loadIcon = async () => {
+      try {
+        const data = await readFile(iconValue);
+        const blob = new Blob([data], { type: 'image/png' });
+        const url = URL.createObjectURL(blob);
+        if (!cancelled) {
+          iconCache.set(iconValue, url);
+          setBlobUrl(url);
+        }
+      } catch (err) {
+        console.error('Failed to load icon:', err);
+      }
+    };
+    loadIcon();
+    return () => { cancelled = true; };
+  }, [iconValue, isFilePath]);
+
+  if (action.icon?.type === 'emoji') {
+    return <span style={{ fontSize: size }}>{action.icon.value}</span>;
+  }
+  if (action.icon?.type === 'image') {
+    const src = isFilePath ? blobUrl : iconValue;
+    if (!src) return null;
+    return (
+      <img 
+        src={src} 
+        alt="" 
+        style={{ width: size, height: size, objectFit: 'contain' }}
+      />
+    );
+  }
+  
+  switch (action.action.type) {
+    case 'open_app': return <ExternalLink size={size} />;
+    case 'execute_script': return <Terminal size={size} />;
+    default: return <Play size={size} />;
+  }
+};
+
+const getActionIcon = (action: ClickAction, size: number = 48) => {
   if (action.icon) {
     if (action.icon.type === 'emoji') {
       return <span style={{ fontSize: size }}>{action.icon.value}</span>;
     }
     if (action.icon.type === 'image') {
-      const imgSrc = action.icon.value.startsWith('/') 
-        ? convertFileSrc(action.icon.value) 
-        : action.icon.value;
+      const isFilePath = action.icon.value.startsWith('/');
+      if (isFilePath) {
+        return <ActionIcon action={action} size={size} />;
+      }
       return (
         <img 
-          src={imgSrc} 
+          src={action.icon.value} 
           alt="" 
           style={{ width: size, height: size, objectFit: 'contain' }}
         />
@@ -234,7 +291,7 @@ const GalleryCard: React.FC<GalleryCardProps> = ({
         {...listeners}
       >
         <div className="gallery-icon">
-          {getActionIcon(action, 24)}
+          {getActionIcon(action, 48)}
         </div>
         <div className="gallery-name">{action.name}</div>
       </div>
@@ -866,8 +923,8 @@ export const ActionList: React.FC<ActionListProps> = ({ onEdit }) => {
           color: #2563eb;
         }
         .gallery-icon svg {
-          width: 24px;
-          height: 24px;
+          width: 28px;
+          height: 28px;
         }
         .gallery-name {
           font-size: 12px;

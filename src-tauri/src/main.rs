@@ -288,13 +288,22 @@ fn save_icon_to_file(icon_data: &[u8], app_path: &str) -> Result<Option<String>,
         icns::IconType::RGBA32_128x128,
         icns::IconType::RGBA32_64x64,
         icns::IconType::RGBA32_32x32,
-        icns::IconType::RGB24_128x128,
-        icns::IconType::RGB24_48x48,
-        icns::IconType::RGB24_32x32,
     ] {
         if let Ok(icon) = icon_family.get_icon_with_type(icon_type) {
-            fs::write(&png_path, icon.data())
+            let width = icon.width();
+            let height = icon.height();
+            let pixel_data = icon.data();
+            
+            let mut img = image::RgbaImage::from_raw(width, height, pixel_data.to_vec())
+                .ok_or("创建图像失败")?;
+            
+            if width > 128 || height > 128 {
+                img = image::imageops::resize(&img, 128, 128, image::imageops::FilterType::Lanczos3);
+            }
+            
+            img.save(&png_path)
                 .map_err(|e| format!("保存图标失败: {}", e))?;
+            
             return Ok(Some(png_path.to_string_lossy().to_string()));
         }
     }
