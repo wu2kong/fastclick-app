@@ -25,7 +25,7 @@ const defaultForm: FormState = {
   id: null,
   name: '',
   description: '',
-  icon: 'folder',
+  icon: '',
   color: '#3b82f6',
   parentId: null,
 };
@@ -179,7 +179,8 @@ export const CategoryTagManager: React.FC<CategoryTagManagerProps> = ({
         categories.map((category) => (
           <div key={category.id} className="list-item">
             <div className="item-info">
-              <span className="item-icon">{category.icon}</span>
+              {/* <span className="item-icon">{category.icon}</span> */}
+              <Folder size={16} />
               <div className="item-details">
                 <span className="item-name">{category.name}</span>
                 <span className="item-desc">{category.description}</span>
@@ -309,7 +310,7 @@ export const CategoryTagManager: React.FC<CategoryTagManagerProps> = ({
         />
       </div>
 
-      {activeTab === 'categories' && (
+      {activeTab === 'categories' && false && (
         <div className="form-group">
           <label>图标</label>
           <div className="icon-selector">
@@ -354,6 +355,7 @@ export const CategoryTagManager: React.FC<CategoryTagManagerProps> = ({
               value={formData.color}
               onChange={(e) => setFormData({ ...formData, color: e.target.value })}
               className="color-picker"
+              style={{ width: '100%' }}
             />
           </div>
 
@@ -412,7 +414,7 @@ export const CategoryTagManager: React.FC<CategoryTagManagerProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
+    <div className="modal-overlay" onClick={() => null}>
       <div className="modal-content manager-modal" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
           <h2>管理{activeTab === 'categories' ? '分类' : '标签'}</h2>
@@ -690,7 +692,6 @@ export const CategoryTagManager: React.FC<CategoryTagManagerProps> = ({
         }
         .form-group input,
         .form-group select {
-          width: 100%;
           padding: 10px 12px;
           border: 1px solid #d1d5db;
           border-radius: 8px;
@@ -698,6 +699,9 @@ export const CategoryTagManager: React.FC<CategoryTagManagerProps> = ({
           color: #374151;
           background: #ffffff;
           transition: all 0.15s;
+        }
+        .form-group input {
+          width: calc(100% - 24px);
         }
         .form-group input:focus,
         .form-group select:focus {
@@ -733,8 +737,8 @@ export const CategoryTagManager: React.FC<CategoryTagManagerProps> = ({
           color: #2563eb;
         }
         .color-selector {
-          display: grid;
-          grid-template-columns: repeat(6, 1fr);
+          display: flex;
+          flex-wrap: wrap;
           gap: 8px;
           margin-bottom: 8px;
         }
@@ -745,6 +749,7 @@ export const CategoryTagManager: React.FC<CategoryTagManagerProps> = ({
           cursor: pointer;
           transition: transform 0.15s;
           position: relative;
+          flex: 1;
         }
         .color-option:hover {
           transform: scale(1.1);

@@ -119,7 +119,7 @@ export const ActionFormModal: React.FC<ActionFormModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
+    <div className="modal-overlay" onClick={() => null}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
           <h2>{editAction ? '编辑小程序' : '添加小程序'}</h2>
