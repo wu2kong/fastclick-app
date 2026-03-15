@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { 
   Folder, Tag, ChevronRight, ChevronDown, Plus, 
-  Menu, ArrowLeftToLine
+  Menu, ArrowLeftToLine, Settings
 } from 'lucide-react';
 import { useAppStore } from '../stores/appStore';
 import {
@@ -24,6 +24,7 @@ import { CSS } from '@dnd-kit/utilities';
 interface SidebarProps {
   onAddClick: () => void;
   onManageClick?: (tab: 'categories' | 'tags') => void;
+  onSettingsClick?: () => void;
 }
 
 interface SortableItemProps {
@@ -54,7 +55,7 @@ const SortableItem: React.FC<SortableItemProps> = ({ id, children }) => {
   );
 };
 
-export const Sidebar: React.FC<SidebarProps> = ({ onAddClick, onManageClick }) => {
+export const Sidebar: React.FC<SidebarProps> = ({ onAddClick, onManageClick, onSettingsClick }) => {
   const {
     categories,
     tags,
@@ -145,9 +146,16 @@ export const Sidebar: React.FC<SidebarProps> = ({ onAddClick, onManageClick }) =
     <div className="sidebar">
       <div className="sidebar-header">
         <h2 className="app-title">FastClickApp</h2>
-        <button className="toggle-btn" onClick={toggleSidebar}>
-          <ArrowLeftToLine size={20} />
-        </button>
+        <div className="header-actions">
+          {onSettingsClick && (
+            <button className="settings-btn" onClick={onSettingsClick} title="设置">
+              <Settings size={18} />
+            </button>
+          )}
+          <button className="toggle-btn" onClick={toggleSidebar}>
+            <ArrowLeftToLine size={20} />
+          </button>
+        </div>
       </div>
 
       <div className="sidebar-content">
@@ -306,6 +314,24 @@ export const Sidebar: React.FC<SidebarProps> = ({ onAddClick, onManageClick }) =
           justify-content: space-between;
           padding: 16px;
           border-bottom: 1px solid #e5e7eb;
+        }
+        .header-actions {
+          display: flex;
+          align-items: center;
+          gap: 4px;
+        }
+        .settings-btn {
+          background: none;
+          border: none;
+          cursor: pointer;
+          padding: 6px;
+          border-radius: 6px;
+          color: #6b7280;
+          transition: all 0.15s;
+        }
+        .settings-btn:hover {
+          background: #f3f4f6;
+          color: #374151;
         }
         .app-title {
           font-size: 16px;

@@ -6,6 +6,7 @@ import { ActionList } from './components/ActionList';
 import { ActionFormModal } from './components/ActionFormModal';
 import { AddActionModal } from './components/AddActionModal';
 import { CategoryTagManager } from './components/CategoryTagManager';
+import { Settings } from './components/Settings';
 import { useAppStore } from './stores/appStore';
 import type { ClickAction } from './types';
 
@@ -21,6 +22,7 @@ function App() {
   const [editingAction, setEditingAction] = useState<ClickAction | null>(null);
   const [isManagerOpen, setIsManagerOpen] = useState(false);
   const [managerTab, setManagerTab] = useState<'categories' | 'tags'>('categories');
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   
   const initializeStore = useAppStore((state) => state.initializeStore);
   const isLoading = useAppStore((state) => state.isLoading);
@@ -124,6 +126,10 @@ function App() {
     setIsManagerOpen(false);
   };
 
+  const handleSettingsClick = () => {
+    setIsSettingsOpen(true);
+  };
+
   if (isLoading) {
     return (
       <div className="app loading">
@@ -145,9 +151,23 @@ function App() {
     );
   }
 
+  if (isSettingsOpen) {
+    return (
+      <div className="app">
+        <Settings onBack={() => setIsSettingsOpen(false)} />
+        <style>{`
+          .app {
+            height: 100vh;
+            overflow: hidden;
+          }
+        `}</style>
+      </div>
+    );
+  }
+
   return (
     <div className="app">
-      <Sidebar onAddClick={handleAddClick} onManageClick={handleManageClick} />
+      <Sidebar onAddClick={handleAddClick} onManageClick={handleManageClick} onSettingsClick={handleSettingsClick} />
       <ActionList onEdit={handleEdit} />
       <AddActionModal
         isOpen={isAddModalOpen}

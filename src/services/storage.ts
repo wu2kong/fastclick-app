@@ -1,5 +1,7 @@
 import { BaseDirectory, exists, mkdir, readTextFile, writeTextFile } from '@tauri-apps/plugin-fs';
 import type { ClickAction, Category, Tag, ViewMode } from '../types';
+import type { AppSettings } from '../types/settings';
+import { defaultSettings } from '../types/settings';
 
 const CONFIG_DIR = '.fastclick';
 
@@ -8,6 +10,7 @@ const FILES = {
   categories: 'app-cates.json',
   tags: 'app-tags.json',
   userData: 'app-user-data.json',
+  settings: 'settings.json',
 } as const;
 
 export interface AppConfig {
@@ -143,6 +146,13 @@ export const storage = {
 
   async saveUserData(data: UserData): Promise<void> {
     await writeJsonFile(FILES.userData, data);
+  },
+
+  async loadSettings(): Promise<AppSettings> {
+    return readJsonFile<AppSettings>(FILES.settings, defaultSettings);
+  },
+
+  async saveSettings(settings: AppSettings): Promise<void> {await writeJsonFile(FILES.settings, settings);
   },
 
   async loadAll(): Promise<{ appConfig: AppConfig; categories: Category[]; tags: Tag[]; userData: UserData }> {

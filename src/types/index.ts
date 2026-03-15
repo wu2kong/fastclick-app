@@ -66,3 +66,5 @@ export interface FilterState {
   viewMode: ViewMode;
   searchQuery: string;
 }
+
+export * from './settings';
