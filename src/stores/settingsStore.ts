@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import type { AppSettings, GeneralSettings, ShortcutsSettings, AdvancedSettings, ThemeMode } from '../types/settings';
 import { defaultSettings } from '../types/settings';
 import { storage } from '../services/storage';
+import { invoke } from '@tauri-apps/api/core';
 
 interface SettingsState {
   settings: AppSettings;
@@ -34,6 +35,12 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
     try {
       const settings = await storage.loadSettings();
       set({ settings, isInitialized: true });
+      try {
+        await invoke('set_minimize_to_tray', { enabled: settings.general.minimizeToTray });
+        console.log('[Settings] Initialized minimizeToTray to', settings.general.minimizeToTray);
+      } catch (e) {
+        console.error('[Settings] Failed to init minimizeToTray:', e);
+      }
     } catch (error) {
       console.error('Failed to load settings:', error);
       set({ settings: defaultSettings, isInitialized: true });
@@ -108,7 +115,16 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
         general: { ...state.settings.general, minimizeToTray: !state.settings.general.minimizeToTray },
       },
     }));
-    setTimeout(() => get().saveSettings(), 0);
+    setTimeout(async () => {
+      await get().saveSettings();
+      const newValue = get().settings.general.minimizeToTray;
+      try {
+        await invoke('set_minimize_to_tray', { enabled: newValue });
+        console.log('[Settings] Set minimizeToTray to', newValue);
+      } catch (e) {
+        console.error('[Settings] Failed to set minimizeToTray:', e);
+      }
+    }, 0);
   },
 
   setPreferredTerminal: (terminal) => {

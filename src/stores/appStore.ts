@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import type { ClickAction, Category, Tag, ViewMode } from '../types';
 import { storage } from '../services/storage';
+import { invoke } from '@tauri-apps/api/core';
 
 interface AppState {
   clickActions: ClickAction[];
@@ -51,6 +52,14 @@ interface AppState {
 
 const generateId = () => Math.random().toString(36).substring(2, 9);
 
+async function refreshTrayMenu() {
+  try {
+    await invoke('refresh_tray_menu');
+  } catch (error) {
+    console.error('Failed to refresh tray menu:', error);
+  }
+}
+
 export const useAppStore = create<AppState>((set, get) => ({
   clickActions: [],
   categories: [],
@@ -78,7 +87,10 @@ export const useAppStore = create<AppState>((set, get) => ({
       order: action.order ?? get().clickActions.length,
     };
     set((state) => ({ clickActions: [...state.clickActions, newAction] }));
-    setTimeout(() => get().saveToStorage(), 0);
+    setTimeout(async () => {
+      await get().saveToStorage();
+      await refreshTrayMenu();
+    }, 0);
   },
   
   updateClickAction: (id, action) => {
@@ -87,14 +99,20 @@ export const useAppStore = create<AppState>((set, get) => ({
         a.id === id ? { ...a, ...action, updatedAt: Date.now() } : a
       ),
     }));
-    setTimeout(() => get().saveToStorage(), 0);
+    setTimeout(async () => {
+      await get().saveToStorage();
+      await refreshTrayMenu();
+    }, 0);
   },
   
   deleteClickAction: (id) => {
     set((state) => ({
       clickActions: state.clickActions.filter((a) => a.id !== id),
     }));
-    setTimeout(() => get().saveToStorage(), 0);
+    setTimeout(async () => {
+      await get().saveToStorage();
+      await refreshTrayMenu();
+    }, 0);
   },
   
   incrementExecutionCount: (id) => {
@@ -108,7 +126,10 @@ export const useAppStore = create<AppState>((set, get) => ({
 
   setCategories: (categories) => {
     set({ categories });
-    setTimeout(() => get().saveToStorage(), 0);
+    setTimeout(async () => {
+      await get().saveToStorage();
+      await refreshTrayMenu();
+    }, 0);
   },
   
   addCategory: (category) => {
@@ -119,7 +140,10 @@ export const useAppStore = create<AppState>((set, get) => ({
       order: category.order ?? get().categories.length,
     };
     set((state) => ({ categories: [...state.categories, newCategory] }));
-    setTimeout(() => get().saveToStorage(), 0);
+    setTimeout(async () => {
+      await get().saveToStorage();
+      await refreshTrayMenu();
+    }, 0);
   },
   
   updateCategory: (id, category) => {
@@ -128,7 +152,10 @@ export const useAppStore = create<AppState>((set, get) => ({
         c.id === id ? { ...c, ...category } : c
       ),
     }));
-    setTimeout(() => get().saveToStorage(), 0);
+    setTimeout(async () => {
+      await get().saveToStorage();
+      await refreshTrayMenu();
+    }, 0);
   },
   
   deleteCategory: (id) => {
@@ -136,7 +163,10 @@ export const useAppStore = create<AppState>((set, get) => ({
       categories: state.categories.filter((c) => c.id !== id),
       clickActions: state.clickActions.filter((a) => a.categoryId !== id),
     }));
-    setTimeout(() => get().saveToStorage(), 0);
+    setTimeout(async () => {
+      await get().saveToStorage();
+      await refreshTrayMenu();
+    }, 0);
   },
 
   setTags: (tags) => {
@@ -184,7 +214,10 @@ export const useAppStore = create<AppState>((set, get) => ({
       }));
       return { categories: updatedCategories };
     });
-    setTimeout(() => get().saveToStorage(), 0);
+    setTimeout(async () => {
+      await get().saveToStorage();
+      await refreshTrayMenu();
+    }, 0);
   },
 
   reorderTags: (fromIndex, toIndex) => {
@@ -212,7 +245,10 @@ export const useAppStore = create<AppState>((set, get) => ({
       }));
       return { clickActions: updatedActions };
     });
-    setTimeout(() => get().saveToStorage(), 0);
+    setTimeout(async () => {
+      await get().saveToStorage();
+      await refreshTrayMenu();
+    }, 0);
   },
 
   setSelectedCategory: (id) => {
@@ -305,6 +341,8 @@ export const useAppStore = create<AppState>((set, get) => ({
         searchQuery: appConfig.searchQuery,
         isInitialized: true,
       });
+      
+      await refreshTrayMenu();
     } catch (error) {
       console.error('Failed to initialize store:', error);
     } finally {
