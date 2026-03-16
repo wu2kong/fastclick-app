@@ -1,0 +1,4 @@
+/* Theme using CSS variables - automatically switches with dark/light class on html */
+
+/* Common theme styles are defined in index.html */
+/* Components should use var(--xxx) to reference theme colors */

@@ -669,15 +669,15 @@ export const ActionList: React.FC<ActionListProps> = ({ onEdit }) => {
           flex: 1;
           display: flex;
           flex-direction: column;
-          background: #f9fafb;
+          background: var(--bg-secondary);
         }
 .toolbar {
           display: flex;
           align-items: center;
           justify-content: space-between;
           padding: 16px 24px;
-          background: #ffffff;
-          border-bottom: 1px solid #e5e7eb;
+          background: var(--bg-primary);
+          border-bottom: 1px solid var(--border-primary);
         }
         .toolbar-right {
           display: flex;
@@ -688,11 +688,11 @@ export const ActionList: React.FC<ActionListProps> = ({ onEdit }) => {
           display: flex;
           align-items: center;
           gap: 10px;
-          background: #f3f4f6;
+          background: var(--bg-tertiary);
           padding: 8px 14px;
           border-radius: 8px;
           width: 320px;
-          color: #6b7280;
+          color: var(--text-tertiary);
         }
         .search-box input {
           border: none;
@@ -700,7 +700,7 @@ export const ActionList: React.FC<ActionListProps> = ({ onEdit }) => {
           outline: none;
           font-size: 14px;
           width: 100%;
-          color: #374151;
+          color: var(--text-secondary);
         }
         .sort-control {
           position: relative;
@@ -716,20 +716,20 @@ export const ActionList: React.FC<ActionListProps> = ({ onEdit }) => {
           background: transparent;
           cursor: pointer;
           border-radius: 4px;
-          color: #6b7280;
+          color: var(--text-tertiary);
           transition: all 0.15s;
         }
         .sort-toggle-btn:hover {
-          background: #f3f4f6;
-          color: #374151;
+          background: var(--bg-tertiary);
+          color: var(--text-secondary);
         }
         .sort-menu {
           position: absolute;
           top: calc(100% + 8px);
           right: 0;
-          background: #ffffff;
+          background: var(--bg-primary);
           border-radius: 8px;
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+          box-shadow: var(--shadow-md);
           padding: 4px 0;
           min-width: 160px;
           z-index: 1000;
@@ -737,7 +737,7 @@ export const ActionList: React.FC<ActionListProps> = ({ onEdit }) => {
         .sort-menu-header {
           padding: 8px 12px;
           font-size: 11px;
-          color: #9ca3af;
+          color: var(--text-muted);
           text-transform: uppercase;
           font-weight: 500;
         }
@@ -751,15 +751,15 @@ export const ActionList: React.FC<ActionListProps> = ({ onEdit }) => {
           background: transparent;
           cursor: pointer;
           font-size: 13px;
-          color: #374151;
+          color: var(--text-secondary);
           transition: all 0.15s;
         }
         .sort-menu-item:hover {
-          background: #f3f4f6;
+          background: var(--bg-tertiary);
         }
         .sort-menu-item.active {
-          background: #eff6ff;
-          color: #2563eb;
+          background: var(--accent-bg);
+          color: var(--accent-primary);
         }
         .sort-menu-item-content {
           display: flex;
@@ -767,13 +767,13 @@ export const ActionList: React.FC<ActionListProps> = ({ onEdit }) => {
           gap: 8px;
         }
         .check-icon {
-          color: #2563eb;
+          color: var(--accent-primary);
           font-weight: 600;
         }
         .view-toggle {
           display: flex;
           gap: 4px;
-          background: #f3f4f6;
+          background: var(--bg-tertiary);
           padding: 4px;
           border-radius: 6px;
         }
@@ -786,64 +786,18 @@ export const ActionList: React.FC<ActionListProps> = ({ onEdit }) => {
           background: transparent;
           cursor: pointer;
           border-radius: 4px;
-          color: #6b7280;
+          color: var(--text-tertiary);
           transition: all 0.15s;
         }
         .view-toggle button.active {
-          background: #ffffff;
-          color: #2563eb;
-          box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+          background: var(--bg-primary);
+          color: var(--accent-primary);
+          box-shadow: var(--shadow-sm);
         }
         .view-toggle button:hover:not(.active) {
-          color: #374151;
-        }
-        .search-box {
-          display: flex;
-          align-items: center;
-          gap: 10px;
-          background: #f3f4f6;
-          padding: 8px 14px;
-          border-radius: 8px;
-          width: 320px;
-          color: #6b7280;
-        }
-        .search-box input {
-          border: none;
-          background: transparent;
-          outline: none;
-          font-size: 14px;
-          width: 100%;
-          color: #374151;
-        }
-        .view-toggle {
-          display: flex;
-          gap: 4px;
-          background: #f3f4f6;
-          padding: 4px;
-          border-radius: 6px;
-        }
-        .view-toggle button {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          padding: 6px;
-          border: none;
-          background: transparent;
-          cursor: pointer;
-          border-radius: 4px;
-          color: #6b7280;
-          transition: all 0.15s;
-        }
-        .view-toggle button.active {
-          background: #ffffff;
-          color: #2563eb;
-          box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        }
-        .view-toggle button:hover:not(.active) {
-          color: #374151;
+          color: var(--text-secondary);
         }
         .content {
-          // flex: 1;
           overflow-y: auto;
           padding: 24px;
         }
@@ -869,7 +823,7 @@ export const ActionList: React.FC<ActionListProps> = ({ onEdit }) => {
           align-items: center;
           justify-content: center;
           height: 100%;
-          color: #9ca3af;
+          color: var(--text-muted);
         }
         .empty-state p {
           font-size: 16px;
@@ -880,15 +834,15 @@ export const ActionList: React.FC<ActionListProps> = ({ onEdit }) => {
           margin-top: 8px;
         }
         .action-card {
-          background: #ffffff;
+          background: var(--bg-primary);
           border-radius: 10px;
           padding: 12px;
-          border: 1px solid #e5e7eb;
+          border: 1px solid var(--border-primary);
           transition: all 0.15s;
         }
         .action-card:hover {
-          border-color: #d1d5db;
-          box-shadow: 0 2px 4px -1px rgba(0,0,0,0.1);
+          border-color: var(--border-secondary);
+          box-shadow: var(--shadow-md);
         }
         .sortable-action-card {
           cursor: grab;
@@ -896,110 +850,19 @@ export const ActionList: React.FC<ActionListProps> = ({ onEdit }) => {
         .sortable-action-card:active {
           cursor: grabbing;
         }
-        .sort-control {
-          position: relative;
-          display: flex;
-          align-items: center;
-        }
-        .sort-select-btn {
-          display: flex;
-          align-items: center;
-          gap: 6px;
-          padding: 8px 12px;
-          background: #f3f4f6;
-          border: 1px solid #e5e7eb;
-          border-radius: 8px;
-          cursor: pointer;
-          font-size: 13px;
-          color: #374151;
-          transition: all 0.15s;
-        }
-        .sort-select-btn:hover {
-          background: #e5e7eb;
-          border-color: #d1d5db;
-        }
-        .sort-select-btn svg {
-          color: #6b7280;
-        }
-        .sort-menu {
-          position: absolute;
-          top: calc(100% + 4px);
-          left: 0;
-          background: #ffffff;
-          border-radius: 8px;
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-          padding: 4px 0;
-          min-width: 160px;
-          z-index: 1000;
-        }
-        .sort-menu-header {
-          padding: 8px 12px;
-          font-size: 11px;
-          color: #9ca3af;
-          text-transform: uppercase;
-          font-weight: 500;
-        }
-        .sort-menu-item {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          width: 100%;
-          padding: 8px 12px;
-          border: none;
-          background: transparent;
-          cursor: pointer;
-          font-size: 13px;
-          color: #374151;
-          transition: all 0.15s;
-        }
-        .sort-menu-item:hover {
-          background: #f3f4f6;
-        }
-        .sort-menu-item.active {
-          background: #eff6ff;
-          color: #2563eb;
-        }
-        .check-icon {
-          color: #2563eb;
-          font-weight: 600;
-        }
-        .sort-menu-divider {
-          height: 1px;
-          background: #e5e7eb;
-          margin: 4px 0;
-        }
-        .sort-order-btn {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          width: 100%;
-          padding: 8px 12px;
-          border: none;
-          background: transparent;
-          cursor: pointer;
-          font-size: 13px;
-          color: #374151;
-          transition: all 0.15s;
-        }
-        .sort-order-btn:hover {
-          background: #f3f4f6;
-        }
-        .sort-order-btn svg {
-          color: #6b7280;
-        }
         .drag-handle {
           display: flex;
           align-items: center;
           justify-content: center;
-          color: #d1d5db;
+          color: var(--border-secondary);
           cursor: grab;
           padding: 4px;
           border-radius: 4px;
           flex-shrink: 0;
         }
         .drag-handle:hover {
-          color: #9ca3af;
-          background: #f3f4f6;
+          color: var(--text-muted);
+          background: var(--bg-tertiary);
         }
         .drag-handle:active {
           cursor: grabbing;
@@ -1012,12 +875,12 @@ export const ActionList: React.FC<ActionListProps> = ({ onEdit }) => {
         .icon-wrapper {
           width: 36px;
           height: 36px;
-          background: #eff6ff;
+          background: var(--accent-bg);
           border-radius: 8px;
           display: flex;
           align-items: center;
           justify-content: center;
-          color: #2563eb;
+          color: var(--accent-primary);
           flex-shrink: 0;
           padding: 6px;
         }
@@ -1038,7 +901,7 @@ export const ActionList: React.FC<ActionListProps> = ({ onEdit }) => {
           margin: 0;
           font-size: 14px;
           font-weight: 600;
-          color: #111827;
+          color: var(--text-primary);
           overflow: hidden;
           text-overflow: ellipsis;
           white-space: nowrap;
@@ -1061,24 +924,24 @@ export const ActionList: React.FC<ActionListProps> = ({ onEdit }) => {
           background: transparent;
           cursor: pointer;
           border-radius: 4px;
-          color: #9ca3af;
+          color: var(--text-muted);
           transition: all 0.15s;
         }
         .card-actions button:hover {
-          background: #f3f4f6;
-          color: #374151;
+          background: var(--bg-tertiary);
+          color: var(--text-secondary);
         }
         .card-actions .execute-btn:hover {
-          background: #dcfce7;
-          color: #16a34a;
+          background: var(--success-bg);
+          color: var(--success-text);
         }
         .card-actions .delete-btn:hover {
-          background: #fee2e2;
-          color: #dc2626;
+          background: var(--danger-bg);
+          color: var(--danger-text);
         }
         .description {
           font-size: 12px;
-          color: #6b7280;
+          color: var(--text-tertiary);
           margin: 0;
           line-height: 1.4;
           display: -webkit-box;
@@ -1088,23 +951,23 @@ export const ActionList: React.FC<ActionListProps> = ({ onEdit }) => {
           font-style: italic;
         }
         .no-desc {
-          color: #9ca3af;
+          color: var(--text-muted);
         }
         .card-meta {
           display: flex;
           align-items: center;
           gap: 8px;
           font-size: 11px;
-          color: #9ca3af;
+          color: var(--text-muted);
           margin-top: 4px;
         }
         .category {
-          background: #f3f4f6;
+          background: var(--bg-tertiary);
           padding: 2px 6px;
           border-radius: 4px;
         }
         .tags {
-          color: #9ca3af;
+          color: var(--text-muted);
           overflow: hidden;
           text-overflow: ellipsis;
           white-space: nowrap;
@@ -1126,34 +989,34 @@ export const ActionList: React.FC<ActionListProps> = ({ onEdit }) => {
           z-index: 2000;
         }
         .delete-modal {
-          background: #ffffff;
+          background: var(--bg-primary);
           border-radius: 12px;
           padding: 24px;
           width: 360px;
           text-align: center;
-          box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+          box-shadow: var(--shadow-md);
         }
         .delete-modal-icon {
           width: 56px;
           height: 56px;
-          background: #fef2f2;
+          background: var(--danger-bg);
           border-radius: 50%;
           display: flex;
           align-items: center;
           justify-content: center;
           margin: 0 auto 16px;
-          color: #dc2626;
+          color: var(--danger-text);
         }
         .delete-modal h3 {
           margin: 0 0 8px;
           font-size: 18px;
           font-weight: 600;
-          color: #111827;
+          color: var(--text-primary);
         }
         .delete-modal p {
           margin: 0 0 24px;
           font-size: 14px;
-          color: #6b7280;
+          color: var(--text-tertiary);
         }
         .delete-modal-actions {
           display: flex;
@@ -1169,15 +1032,15 @@ export const ActionList: React.FC<ActionListProps> = ({ onEdit }) => {
           transition: all 0.15s;
         }
         .btn-cancel {
-          background: #f3f4f6;
+          background: var(--bg-tertiary);
           border: none;
-          color: #374151;
+          color: var(--text-secondary);
         }
         .btn-cancel:hover {
-          background: #e5e7eb;
+          background: var(--bg-hover);
         }
         .btn-delete {
-          background: #dc2626;
+          background: var(--danger-text);
           border: none;
           color: #ffffff;
         }
@@ -1185,10 +1048,10 @@ export const ActionList: React.FC<ActionListProps> = ({ onEdit }) => {
           background: #b91c1c;
         }
         .gallery-card {
-          background: #ffffff;
+          background: var(--bg-primary);
           border-radius: 10px;
           padding: 16px 12px;
-          border: 1px solid #e5e7eb;
+          border: 1px solid var(--border-primary);
           display: flex;
           flex-direction: column;
           align-items: center;
@@ -1198,8 +1061,8 @@ export const ActionList: React.FC<ActionListProps> = ({ onEdit }) => {
           min-height: 100px;
         }
         .gallery-card:hover {
-          border-color: #d1d5db;
-          box-shadow: 0 2px 4px -1px rgba(0,0,0,0.1);
+          border-color: var(--border-secondary);
+          box-shadow: var(--shadow-md);
         }
         .gallery-card:active {
           cursor: grabbing;
@@ -1207,12 +1070,12 @@ export const ActionList: React.FC<ActionListProps> = ({ onEdit }) => {
         .gallery-icon {
           width: 48px;
           height: 48px;
-          background: #eff6ff;
+          background: var(--accent-bg);
           border-radius: 10px;
           display: flex;
           align-items: center;
           justify-content: center;
-          color: #2563eb;
+          color: var(--accent-primary);
         }
         .gallery-icon svg {
           width: 28px;
@@ -1221,7 +1084,7 @@ export const ActionList: React.FC<ActionListProps> = ({ onEdit }) => {
         .gallery-name {
           font-size: 12px;
           font-weight: 500;
-          color: #374151;
+          color: var(--text-secondary);
           text-align: center;
           line-height: 1.3;
           display: -webkit-box;
@@ -1232,9 +1095,9 @@ export const ActionList: React.FC<ActionListProps> = ({ onEdit }) => {
         }
         .context-menu {
           position: fixed;
-          background: #ffffff;
+          background: var(--bg-primary);
           border-radius: 8px;
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+          box-shadow: var(--shadow-md);
           padding: 4px 0;
           z-index: 3000;
           min-width: 120px;
@@ -1249,23 +1112,23 @@ export const ActionList: React.FC<ActionListProps> = ({ onEdit }) => {
           background: transparent;
           cursor: pointer;
           font-size: 13px;
-          color: #374151;
+          color: var(--text-secondary);
           transition: all 0.15s;
         }
         .context-menu .menu-item:hover {
-          background: #f3f4f6;
+          background: var(--bg-tertiary);
         }
         .context-menu .menu-item.execute:hover {
-          background: #dcfce7;
-          color: #16a34a;
+          background: var(--success-bg);
+          color: var(--success-text);
         }
         .context-menu .menu-item.edit:hover {
-          background: #eff6ff;
-          color: #2563eb;
+          background: var(--accent-bg);
+          color: var(--accent-primary);
         }
         .context-menu .menu-item.delete:hover {
-          background: #fee2e2;
-          color: #dc2626;
+          background: var(--danger-bg);
+          color: var(--danger-text);
         }
       `}</style>
     </div>

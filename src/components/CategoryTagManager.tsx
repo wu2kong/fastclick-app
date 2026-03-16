@@ -473,9 +473,9 @@ export const CategoryTagManager: React.FC<CategoryTagManagerProps> = ({
           z-index: 1000;
         }
         .modal-content {
-          background: #ffffff;
+          background: var(--bg-primary);
           border-radius: 12px;
-          box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
+          box-shadow: var(--shadow-md);
           overflow: hidden;
         }
         .manager-modal {
@@ -490,13 +490,13 @@ export const CategoryTagManager: React.FC<CategoryTagManagerProps> = ({
           align-items: center;
           justify-content: space-between;
           padding: 16px 20px;
-          border-bottom: 1px solid #e5e7eb;
+          border-bottom: 1px solid var(--border-primary);
         }
         .modal-header h2 {
           margin: 0;
           font-size: 17px;
           font-weight: 600;
-          color: #111827;
+          color: var(--text-primary);
         }
         .close-btn {
           background: none;
@@ -504,20 +504,20 @@ export const CategoryTagManager: React.FC<CategoryTagManagerProps> = ({
           cursor: pointer;
           padding: 6px;
           border-radius: 6px;
-          color: #6b7280;
+          color: var(--text-tertiary);
           display: flex;
           align-items: center;
           justify-content: center;
         }
         .close-btn:hover {
-          background: #f3f4f6;
+          background: var(--bg-tertiary);
         }
         .tabs {
           display: flex;
           gap: 8px;
           padding: 12px 16px;
-          border-bottom: 1px solid #e5e7eb;
-          background: #f9fafb;
+          border-bottom: 1px solid var(--border-primary);
+          background: var(--bg-secondary);
         }
         .tab {
           display: flex;
@@ -529,17 +529,17 @@ export const CategoryTagManager: React.FC<CategoryTagManagerProps> = ({
           border-radius: 6px;
           cursor: pointer;
           font-size: 14px;
-          color: #6b7280;
+          color: var(--text-tertiary);
           transition: all 0.15s;
         }
         .tab:hover {
-          background: #e5e7eb;
-          color: #374151;
+          background: var(--bg-hover);
+          color: var(--text-secondary);
         }
         .tab.active {
-          background: #ffffff;
-          color: #2563eb;
-          box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+          background: var(--bg-primary);
+          color: var(--accent-primary);
+          box-shadow: var(--shadow-sm);
         }
         .modal-body {
           flex: 1;
@@ -561,7 +561,7 @@ export const CategoryTagManager: React.FC<CategoryTagManagerProps> = ({
           transition: background 0.15s;
         }
         .list-item:hover {
-          background: #f3f4f6;
+          background: var(--bg-tertiary);
         }
         .tag-item {
           position: relative;
@@ -579,7 +579,7 @@ export const CategoryTagManager: React.FC<CategoryTagManagerProps> = ({
           display: flex;
           align-items: center;
           justify-content: center;
-          background: #e5e7eb;
+          background: var(--border-primary);
           border-radius: 6px;
           font-size: 16px;
         }
@@ -598,14 +598,14 @@ export const CategoryTagManager: React.FC<CategoryTagManagerProps> = ({
         .item-name {
           font-size: 14px;
           font-weight: 500;
-          color: #111827;
+          color: var(--text-primary);
           white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
         }
         .item-desc {
           font-size: 12px;
-          color: #6b7280;
+          color: var(--text-tertiary);
           white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
@@ -625,18 +625,18 @@ export const CategoryTagManager: React.FC<CategoryTagManagerProps> = ({
           cursor: pointer;
           padding: 6px;
           border-radius: 6px;
-          color: #6b7280;
+          color: var(--text-tertiary);
           display: flex;
           align-items: center;
           justify-content: center;
         }
         .action-btn:hover {
-          background: #e5e7eb;
-          color: #374151;
+          background: var(--bg-hover);
+          color: var(--text-secondary);
         }
         .action-btn.danger:hover {
-          background: #fee2e2;
-          color: #dc2626;
+          background: var(--danger-bg);
+          color: var(--danger-text);
         }
         .expand-btn {
           background: none;
@@ -644,14 +644,14 @@ export const CategoryTagManager: React.FC<CategoryTagManagerProps> = ({
           cursor: pointer;
           padding: 2px;
           border-radius: 4px;
-          color: #9ca3af;
+          color: var(--text-muted);
           display: flex;
           align-items: center;
           justify-content: center;
         }
         .expand-btn:hover {
-          background: #e5e7eb;
-          color: #6b7280;
+          background: var(--bg-hover);
+          color: var(--text-tertiary);
         }
         .expand-placeholder {
           width: 18px;
@@ -662,7 +662,7 @@ export const CategoryTagManager: React.FC<CategoryTagManagerProps> = ({
           align-items: center;
           justify-content: center;
           padding: 48px 24px;
-          color: #9ca3af;
+          color: var(--text-muted);
           text-align: center;
         }
         .empty-icon {
@@ -675,7 +675,7 @@ export const CategoryTagManager: React.FC<CategoryTagManagerProps> = ({
         }
         .modal-footer {
           padding: 16px;
-          border-top: 1px solid #e5e7eb;
+          border-top: 1px solid var(--border-primary);
         }
         .modal-form {
           padding: 20px;
@@ -687,17 +687,17 @@ export const CategoryTagManager: React.FC<CategoryTagManagerProps> = ({
           display: block;
           font-size: 13px;
           font-weight: 500;
-          color: #374151;
+          color: var(--text-secondary);
           margin-bottom: 8px;
         }
         .form-group input,
         .form-group select {
           padding: 10px 12px;
-          border: 1px solid #d1d5db;
+          border: 1px solid var(--border-secondary);
           border-radius: 8px;
           font-size: 14px;
-          color: #374151;
-          background: #ffffff;
+          color: var(--text-secondary);
+          background: var(--bg-primary);
           transition: all 0.15s;
         }
         .form-group input {
@@ -706,7 +706,7 @@ export const CategoryTagManager: React.FC<CategoryTagManagerProps> = ({
         .form-group input:focus,
         .form-group select:focus {
           outline: none;
-          border-color: #2563eb;
+          border-color: var(--accent-primary);
           box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
         }
         .icon-selector {
@@ -720,21 +720,21 @@ export const CategoryTagManager: React.FC<CategoryTagManagerProps> = ({
           display: flex;
           align-items: center;
           justify-content: center;
-          border: 1px solid #e5e7eb;
+          border: 1px solid var(--border-primary);
           border-radius: 8px;
-          background: #ffffff;
+          background: var(--bg-primary);
           cursor: pointer;
           font-size: 18px;
           transition: all 0.15s;
         }
         .icon-option:hover {
-          border-color: #2563eb;
-          background: #eff6ff;
+          border-color: var(--accent-primary);
+          background: var(--accent-bg);
         }
         .icon-option.selected {
-          border-color: #2563eb;
-          background: #eff6ff;
-          color: #2563eb;
+          border-color: var(--accent-primary);
+          background: var(--accent-bg);
+          color: var(--accent-primary);
         }
         .color-selector {
           display: flex;
@@ -769,7 +769,7 @@ export const CategoryTagManager: React.FC<CategoryTagManagerProps> = ({
           width: 100%;
           height: 40px;
           padding: 4px;
-          border: 1px solid #d1d5db;
+          border: 1px solid var(--border-secondary);
           border-radius: 8px;
           cursor: pointer;
         }
@@ -778,7 +778,7 @@ export const CategoryTagManager: React.FC<CategoryTagManagerProps> = ({
           justify-content: flex-end;
           gap: 10px;
           padding-top: 16px;
-          border-top: 1px solid #e5e7eb;
+          border-top: 1px solid var(--border-primary);
         }
         .btn-secondary,
         .btn-primary,
@@ -795,21 +795,21 @@ export const CategoryTagManager: React.FC<CategoryTagManagerProps> = ({
           gap: 6px;
         }
         .btn-secondary {
-          background: #f3f4f6;
-          color: #374151;
+          background: var(--bg-tertiary);
+          color: var(--text-secondary);
         }
         .btn-secondary:hover {
-          background: #e5e7eb;
+          background: var(--bg-hover);
         }
         .btn-primary {
-          background: #2563eb;
+          background: var(--accent-primary);
           color: #ffffff;
         }
         .btn-primary:hover {
-          background: #1d4ed8;
+          background: var(--accent-secondary);
         }
         .btn-danger {
-          background: #dc2626;
+          background: var(--danger-text);
           color: #ffffff;
         }
         .btn-danger:hover {
@@ -820,19 +820,19 @@ export const CategoryTagManager: React.FC<CategoryTagManagerProps> = ({
           text-align: center;
         }
         .delete-icon {
-          color: #dc2626;
+          color: var(--danger-text);
           margin-bottom: 16px;
         }
         .delete-confirm h3 {
           margin: 0 0 8px;
           font-size: 18px;
           font-weight: 600;
-          color: #111827;
+          color: var(--text-primary);
         }
         .delete-confirm p {
           margin: 0 0 24px;
           font-size: 14px;
-          color: #6b7280;
+          color: var(--text-tertiary);
           line-height: 1.5;
         }
       `}</style>

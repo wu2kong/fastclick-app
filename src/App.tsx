@@ -9,6 +9,7 @@ import { AddActionModal } from './components/AddActionModal';
 import { CategoryTagManager } from './components/CategoryTagManager';
 import { Settings } from './components/Settings';
 import { useAppStore } from './stores/appStore';
+import { useTheme } from './hooks/useTheme';
 import type { ClickAction } from './types';
 
 interface AppInfo {
@@ -18,6 +19,7 @@ interface AppInfo {
 }
 
 function App() {
+  useTheme();
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isFormModalOpen, setIsFormModalOpen] = useState(false);
   const [editingAction, setEditingAction] = useState<ClickAction | null>(null);
@@ -149,11 +151,11 @@ function App() {
             display: flex;
             align-items: center;
             justify-content: center;
-            background: #f5f5f5;
+            background: var(--bg-secondary);
           }
           .loading-spinner {
             font-size: 16px;
-            color: #666;
+            color: var(--text-tertiary);
           }
         `}</style>
       </div>

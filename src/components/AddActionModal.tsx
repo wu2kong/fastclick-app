@@ -73,24 +73,24 @@ export const AddActionModal: React.FC<AddActionModalProps> = ({
           z-index: 1000;
         }
         .modal-content {
-          background: #ffffff;
+          background: var(--bg-primary);
           border-radius: 12px;
           width: 90%;
           max-width: 420px;
-          box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+          box-shadow: var(--shadow-md);
         }
         .modal-header {
           display: flex;
           align-items: center;
           justify-content: space-between;
           padding: 20px 24px;
-          border-bottom: 1px solid #e5e7eb;
+          border-bottom: 1px solid var(--border-primary);
         }
         .modal-header h2 {
           margin: 0;
           font-size: 18px;
           font-weight: 600;
-          color: #111827;
+          color: var(--text-primary);
         }
         .close-btn {
           background: none;
@@ -98,10 +98,10 @@ export const AddActionModal: React.FC<AddActionModalProps> = ({
           cursor: pointer;
           padding: 4px;
           border-radius: 4px;
-          color: #6b7280;
+          color: var(--text-tertiary);
         }
         .close-btn:hover {
-          background: #f3f4f6;
+          background: var(--bg-tertiary);
         }
         .modal-body {
           padding: 24px;
@@ -114,16 +114,16 @@ export const AddActionModal: React.FC<AddActionModalProps> = ({
           align-items: center;
           gap: 16px;
           padding: 20px;
-          border: 2px solid #e5e7eb;
+          border: 2px solid var(--border-primary);
           border-radius: 10px;
-          background: #ffffff;
+          background: var(--bg-primary);
           cursor: pointer;
           transition: all 0.15s;
           text-align: left;
         }
         .option-btn:hover {
-          border-color: #2563eb;
-          background: #f8fafc;
+          border-color: var(--accent-primary);
+          background: var(--bg-secondary);
         }
         .option-icon {
           width: 48px;
@@ -135,23 +135,23 @@ export const AddActionModal: React.FC<AddActionModalProps> = ({
           flex-shrink: 0;
         }
         .option-btn.manual .option-icon {
-          background: #eff6ff;
-          color: #2563eb;
+          background: var(--accent-bg);
+          color: var(--accent-primary);
         }
         .option-btn.from-app .option-icon {
-          background: #f0fdf4;
-          color: #16a34a;
+          background: var(--success-bg);
+          color: var(--success-text);
         }
         .option-content h3 {
           margin: 0 0 4px;
           font-size: 16px;
           font-weight: 600;
-          color: #111827;
+          color: var(--text-primary);
         }
         .option-content p {
           margin: 0;
           font-size: 13px;
-          color: #6b7280;
+          color: var(--text-tertiary);
         }
       `}</style>
     </div>

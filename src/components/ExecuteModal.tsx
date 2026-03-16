@@ -201,13 +201,13 @@ export const ExecuteModal: React.FC<ExecuteModalProps> = ({
             z-index: 2000;
           }
           .execute-modal {
-            background: #ffffff;
+            background: var(--bg-primary);
             border-radius: 12px;
             width: 480px;
             max-width: 90vw;
             max-height: 80vh;
             overflow: hidden;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            box-shadow: var(--shadow-md);
             display: flex;
             flex-direction: column;
           }
@@ -216,7 +216,7 @@ export const ExecuteModal: React.FC<ExecuteModalProps> = ({
             align-items: center;
             justify-content: space-between;
             padding: 16px 20px;
-            border-bottom: 1px solid #e5e7eb;
+            border-bottom: 1px solid var(--border-primary);
           }
           .modal-title-row {
             display: flex;
@@ -226,18 +226,18 @@ export const ExecuteModal: React.FC<ExecuteModalProps> = ({
           .modal-icon {
             width: 36px;
             height: 36px;
-            background: #eff6ff;
+            background: var(--accent-bg);
             border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #2563eb;
+            color: var(--accent-primary);
           }
           .modal-header h3 {
             margin: 0;
             font-size: 16px;
             font-weight: 600;
-            color: #111827;
+            color: var(--text-primary);
           }
           .close-btn {
             display: flex;
@@ -248,12 +248,12 @@ export const ExecuteModal: React.FC<ExecuteModalProps> = ({
             background: transparent;
             cursor: pointer;
             border-radius: 6px;
-            color: #9ca3af;
+            color: var(--text-muted);
             transition: all 0.15s;
           }
           .close-btn:hover {
-            background: #f3f4f6;
-            color: #374151;
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
           }
           .modal-body {
             padding: 20px;
@@ -269,23 +269,23 @@ export const ExecuteModal: React.FC<ExecuteModalProps> = ({
           }
           .modal-body.loading p {
             margin: 0;
-            color: #6b7280;
+            color: var(--text-tertiary);
             font-size: 14px;
           }
           .spinner {
             animation: spin 1s linear infinite;
-            color: #2563eb;
+            color: var(--accent-primary);
           }
           @keyframes spin {
             from { transform: rotate(0deg); }
             to { transform: rotate(360deg); }
           }
           .script-preview {
-            background: #f3f4f6;
+            background: var(--bg-tertiary);
             padding: 8px 12px;
             border-radius: 6px;
             font-size: 12px;
-            color: #6b7280;
+            color: var(--text-tertiary);
             max-width: 100%;
             overflow-x: auto;
             text-align: center;
@@ -299,12 +299,12 @@ export const ExecuteModal: React.FC<ExecuteModalProps> = ({
             margin-bottom: 16px;
           }
           .status-indicator.success {
-            background: #dcfce7;
-            color: #16a34a;
+            background: var(--success-bg);
+            color: var(--success-text);
           }
           .status-indicator.error {
-            background: #fee2e2;
-            color: #dc2626;
+            background: var(--danger-bg);
+            color: var(--danger-text);
           }
           .status-indicator span {
             font-size: 14px;
@@ -316,15 +316,15 @@ export const ExecuteModal: React.FC<ExecuteModalProps> = ({
           .section-label {
             font-size: 12px;
             font-weight: 500;
-            color: #6b7280;
+            color: var(--text-tertiary);
             margin-bottom: 6px;
           }
           .script-code, .output-code, .info-content {
             display: flex;
             align-items: flex-start;
             gap: 8px;
-            background: #f9fafb;
-            border: 1px solid #e5e7eb;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-primary);
             border-radius: 6px;
             padding: 10px 12px;
           }
@@ -332,7 +332,7 @@ export const ExecuteModal: React.FC<ExecuteModalProps> = ({
             flex: 1;
             margin: 0;
             font-size: 13px;
-            color: #374151;
+            color: var(--text-secondary);
             font-family: 'SF Mono', Monaco, monospace;
             word-break: break-all;
             white-space: pre-wrap;
@@ -353,16 +353,16 @@ export const ExecuteModal: React.FC<ExecuteModalProps> = ({
             background: transparent;
             cursor: pointer;
             border-radius: 4px;
-            color: #9ca3af;
+            color: var(--text-muted);
             transition: all 0.15s;
             flex-shrink: 0;
           }
           .copy-btn:hover {
-            background: #e5e7eb;
-            color: #374151;
+            background: var(--bg-hover);
+            color: var(--text-secondary);
           }
           .copy-btn:has(.check) {
-            color: #16a34a;
+            color: var(--success-text);
           }
         `}</style>
       </div>

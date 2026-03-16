@@ -293,16 +293,16 @@ export const Sidebar: React.FC<SidebarProps> = ({ onAddClick, onManageClick, onS
         .sidebar {
           width: 260px;
           height: 100%;
-          background: #ffffff;
-          border-right: 1px solid #e5e7eb;
+          background: var(--bg-primary);
+          border-right: 1px solid var(--border-primary);
           display: flex;
           flex-direction: column;
         }
         .sidebar-collapsed {
           width: 48px;
           height: 100%;
-          background: #ffffff;
-          border-right: 1px solid #e5e7eb;
+          background: var(--bg-primary);
+          border-right: 1px solid var(--border-primary);
           display: flex;
           align-items: flex-start;
           justify-content: center;
@@ -313,7 +313,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onAddClick, onManageClick, onS
           align-items: center;
           justify-content: space-between;
           padding: 16px;
-          border-bottom: 1px solid #e5e7eb;
+          border-bottom: 1px solid var(--border-primary);
         }
         .header-actions {
           display: flex;
@@ -326,17 +326,17 @@ export const Sidebar: React.FC<SidebarProps> = ({ onAddClick, onManageClick, onS
           cursor: pointer;
           padding: 6px;
           border-radius: 6px;
-          color: #6b7280;
+          color: var(--text-tertiary);
           transition: all 0.15s;
         }
         .settings-btn:hover {
-          background: #f3f4f6;
-          color: #374151;
+          background: var(--bg-tertiary);
+          color: var(--text-secondary);
         }
         .app-title {
           font-size: 16px;
           font-weight: 600;
-          color: #111827;
+          color: var(--text-primary);
           margin: 0;
         }
         .toggle-btn {
@@ -345,10 +345,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ onAddClick, onManageClick, onS
           cursor: pointer;
           padding: 4px;
           border-radius: 4px;
-          color: #6b7280;
+          color: var(--text-tertiary);
         }
         .toggle-btn:hover {
-          background: #f3f4f6;
+          background: var(--bg-tertiary);
         }
         .sidebar-content {
           flex: 1;
@@ -365,7 +365,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onAddClick, onManageClick, onS
           padding: 8px 12px;
           font-size: 12px;
           font-weight: 600;
-          color: #6b7280;
+          color: var(--text-tertiary);
           text-transform: uppercase;
           position: relative;
         }
@@ -376,7 +376,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onAddClick, onManageClick, onS
           cursor: pointer;
           padding: 4px;
           border-radius: 4px;
-          color: #9ca3af;
+          color: var(--text-muted);
           display: flex;
           align-items: center;
           justify-content: center;
@@ -387,8 +387,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ onAddClick, onManageClick, onS
           opacity: 1;
         }
         .manage-btn:hover {
-          background: #e5e7eb;
-          color: #374151;
+          background: var(--bg-hover);
+          color: var(--text-secondary);
         }
         .section-items {
           display: flex;
@@ -402,15 +402,15 @@ export const Sidebar: React.FC<SidebarProps> = ({ onAddClick, onManageClick, onS
           border-radius: 6px;
           cursor: pointer;
           font-size: 14px;
-          color: #374151;
+          color: var(--text-secondary);
           transition: all 0.15s;
         }
         .item:hover {
-          background: #f3f4f6;
+          background: var(--bg-tertiary);
         }
         .item.active {
-          background: #eff6ff;
-          color: #2563eb;
+          background: var(--accent-bg);
+          color: var(--accent-primary);
         }
         .sortable-item {
           cursor: grab;
@@ -435,13 +435,13 @@ export const Sidebar: React.FC<SidebarProps> = ({ onAddClick, onManageClick, onS
           content: '';
           display: block;
           height: 2px;
-          background: #9ca3af;
+          background: var(--text-muted);
           border-radius: 1px;
           margin: 3px 0;
         }
         .sortable-item.active .drag-indicator::before,
         .sortable-item.active .drag-indicator::after {
-          background: #93c5fd;
+          background: var(--accent-secondary);
         }
         .item-name {
           flex: 1;
@@ -461,7 +461,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onAddClick, onManageClick, onS
           border-radius: 3px;
         }
         .expand-icon:hover {
-          background: #e5e7eb;
+          background: var(--bg-hover);
         }
         .tag-dot {
           width: 8px;
@@ -472,14 +472,14 @@ export const Sidebar: React.FC<SidebarProps> = ({ onAddClick, onManageClick, onS
         .count {
           margin-left: auto;
           font-size: 12px;
-          color: #9ca3af;
-          background: #f3f4f6;
+          color: var(--text-muted);
+          background: var(--bg-tertiary);
           padding: 2px 8px;
           border-radius: 10px;
         }
         .sidebar-footer {
           padding: 16px;
-          border-top: 1px solid #e5e7eb;
+          border-top: 1px solid var(--border-primary);
         }
         .add-btn {
           width: 100%;
@@ -488,7 +488,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onAddClick, onManageClick, onS
           justify-content: center;
           gap: 8px;
           padding: 10px;
-          background: #2563eb;
+          background: var(--accent-primary);
           color: white;
           border: none;
           border-radius: 6px;
@@ -498,7 +498,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onAddClick, onManageClick, onS
           transition: background 0.15s;
         }
         .add-btn:hover {
-          background: #1d4ed8;
+          background: var(--accent-secondary);
         }
       `}</style>
     </div>

@@ -293,14 +293,14 @@ export const ActionFormModal: React.FC<ActionFormModalProps> = ({
           z-index: 1000;
         }
         .modal-content {
-          background: #ffffff;
+          background: var(--bg-primary);
           border-radius: 12px;
           width: 90%;
           max-width: 560px;
           max-height: 90vh;
           overflow-y: auto;
           overflow-x: hidden;
-          box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
+          box-shadow: var(--shadow-md);
           box-sizing: border-box;
         }
         .modal-header {
@@ -308,13 +308,13 @@ export const ActionFormModal: React.FC<ActionFormModalProps> = ({
           align-items: center;
           justify-content: space-between;
           padding: 20px 24px;
-          border-bottom: 1px solid #e5e7eb;
+          border-bottom: 1px solid var(--border-primary);
         }
         .modal-header h2 {
           margin: 0;
           font-size: 18px;
           font-weight: 600;
-          color: #111827;
+          color: var(--text-primary);
         }
         .close-btn {
           background: none;
@@ -322,10 +322,10 @@ export const ActionFormModal: React.FC<ActionFormModalProps> = ({
           cursor: pointer;
           padding: 4px;
           border-radius: 4px;
-          color: #6b7280;
+          color: var(--text-tertiary);
         }
         .close-btn:hover {
-          background: #f3f4f6;
+          background: var(--bg-tertiary);
         }
         form {
           padding: 24px;
@@ -352,23 +352,23 @@ export const ActionFormModal: React.FC<ActionFormModalProps> = ({
           display: block;
           font-size: 13px;
           font-weight: 500;
-          color: #374151;
+          color: var(--text-secondary);
           margin-bottom: 6px;
         }
         input, select, textarea {
           width: 100%;
           padding: 10px 12px;
-          border: 1px solid #d1d5db;
+          border: 1px solid var(--border-secondary);
           border-radius: 6px;
           font-size: 14px;
-          color: #374151;
-          background: #ffffff;
+          color: var(--text-secondary);
+          background: var(--bg-primary);
           transition: border-color 0.15s;
           box-sizing: border-box;
         }
         input:focus, select:focus, textarea:focus {
           outline: none;
-          border-color: #2563eb;
+          border-color: var(--accent-primary);
           box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
         }
         textarea {
@@ -416,7 +416,7 @@ export const ActionFormModal: React.FC<ActionFormModalProps> = ({
           gap: 8px;
           font-size: 14px;
           font-weight: 400;
-          color: #374151;
+          color: var(--text-secondary);
           cursor: pointer;
           margin: 0;
           min-width: 0;
@@ -430,7 +430,7 @@ export const ActionFormModal: React.FC<ActionFormModalProps> = ({
           justify-content: flex-end;
           gap: 12px;
           padding-top: 20px;
-          border-top: 1px solid #e5e7eb;
+          border-top: 1px solid var(--border-primary);
           margin-top: 24px;
         }
         .btn-secondary, .btn-primary {
@@ -442,20 +442,20 @@ export const ActionFormModal: React.FC<ActionFormModalProps> = ({
           transition: all 0.15s;
         }
         .btn-secondary {
-          background: #f3f4f6;
+          background: var(--bg-tertiary);
           border: none;
-          color: #374151;
+          color: var(--text-secondary);
         }
         .btn-secondary:hover {
-          background: #e5e7eb;
+          background: var(--bg-hover);
         }
         .btn-primary {
-          background: #2563eb;
+          background: var(--accent-primary);
           border: none;
           color: #ffffff;
         }
         .btn-primary:hover {
-          background: #1d4ed8;
+          background: var(--accent-secondary);
         }
       `}</style>
     </div>
