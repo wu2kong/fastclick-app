@@ -139,6 +139,7 @@ export const Settings: React.FC<SettingsProps> = ({ onBack }) => {
               checked={settings.general.minimizeToTray}
               onChange={toggleMinimizeToTray}
             />
+            <span className="toggle-slider"></span>
           </label>
         </div>
       </div>
