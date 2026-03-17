@@ -1,6 +1,6 @@
 [package]
 name = "clickpad"
-version = "1.0.0"
+version = "1.0.1"
 description = "快速执行小程序的桌面应用"
 authors = ["lihao317@foxmail.com"]
 edition = "2021"
