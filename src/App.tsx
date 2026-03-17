@@ -29,6 +29,7 @@ function App() {
   
   const initializeStore = useAppStore((state) => state.initializeStore);
   const isLoading = useAppStore((state) => state.isLoading);
+  const sidebarCollapsed = useAppStore((state) => state.sidebarCollapsed);
 
   useEffect(() => {
     initializeStore();
@@ -178,8 +179,8 @@ function App() {
 
   return (
     <div className="app">
-      <Sidebar onAddClick={handleAddClick} onManageClick={handleManageClick} onSettingsClick={handleSettingsClick} />
-      <ActionList onEdit={handleEdit} />
+      {!sidebarCollapsed && <Sidebar onAddClick={handleAddClick} onManageClick={handleManageClick} onSettingsClick={handleSettingsClick} />}
+      <ActionList onEdit={handleEdit} onAddClick={handleAddClick} onSettingsClick={handleSettingsClick} />
       <AddActionModal
         isOpen={isAddModalOpen}
         onClose={handleCloseAddModal}

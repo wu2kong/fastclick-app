@@ -2,7 +2,8 @@ import React, { useState, useRef, useEffect } from 'react';
 import { 
   LayoutGrid, List, Search, Play, 
   Edit2, Trash2, ExternalLink, Terminal, AlertTriangle, GripVertical, LayoutPanelLeft,
-  ArrowDownUp, ArrowUpDown, ArrowDownAZ, ArrowUpZA, Clock, ArrowDownWideNarrow, ArrowUpWideNarrow
+  ArrowDownUp, ArrowUpDown, ArrowDownAZ, ArrowUpZA, Clock, ArrowDownWideNarrow, ArrowUpWideNarrow,
+  Menu, Settings, Plus
 } from 'lucide-react';
 import { useAppStore } from '../stores/appStore';
 import type { ClickAction, SortField } from '../types';
@@ -28,6 +29,8 @@ import { CSS } from '@dnd-kit/utilities';
 
 interface ActionListProps {
   onEdit: (action: ClickAction) => void;
+  onAddClick?: () => void;
+  onSettingsClick?: () => void;
 }
 
 const iconCache = new Map<string, string>();
@@ -310,7 +313,7 @@ const GalleryCard: React.FC<GalleryCardProps> = ({
   );
 };
 
-export const ActionList: React.FC<ActionListProps> = ({ onEdit }) => {
+export const ActionList: React.FC<ActionListProps> = ({ onEdit, onAddClick, onSettingsClick }) => {
   const {
     viewMode,
     searchQuery,
@@ -328,6 +331,8 @@ export const ActionList: React.FC<ActionListProps> = ({ onEdit }) => {
     selectedCategoryId,
     selectedTagId,
     reorderActions,
+    sidebarCollapsed,
+    toggleSidebar,
   } = useAppStore();
 
   const [deleteConfirm, setDeleteConfirm] = useState<{ isOpen: false; action: ClickAction | null } | { isOpen: true; action: ClickAction }>({
@@ -546,6 +551,25 @@ export const ActionList: React.FC<ActionListProps> = ({ onEdit }) => {
   return (
     <div className="action-list-container">
       <div className="toolbar">
+        <div className="toolbar-left">
+          {sidebarCollapsed && (
+            <>
+              <button className="toolbar-icon-btn" onClick={toggleSidebar} title="展开侧边栏">
+                <Menu size={18} />
+              </button>
+              {onSettingsClick && (
+                <button className="toolbar-icon-btn" onClick={onSettingsClick} title="设置">
+                  <Settings size={18} />
+                </button>
+              )}
+              {onAddClick && (
+                <button className="toolbar-icon-btn add-btn-toolbar" onClick={onAddClick} title="添加小程序">
+                  <Plus size={18} />
+                </button>
+              )}
+            </>
+          )}
+        </div>
         <div className="search-box">
           <Search size={18} />
           <input
@@ -678,11 +702,43 @@ export const ActionList: React.FC<ActionListProps> = ({ onEdit }) => {
           padding: 16px 24px;
           background: var(--bg-primary);
           border-bottom: 1px solid var(--border-primary);
+          gap: 16px;
         }
-        .toolbar-right {
+        .toolbar-left {
           display: flex;
           align-items: center;
-          gap: 12px;
+          gap: 8px;
+          min-width: 120px;
+        }
+        .toolbar-icon-btn {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 8px;
+          border: none;
+          background: transparent;
+          cursor: pointer;
+          border-radius: 6px;
+          color: var(--text-tertiary);
+          transition: all 0.15s;
+        }
+        .toolbar-icon-btn:hover {
+          background: var(--bg-tertiary);
+          color: var(--text-secondary);
+        }
+        .toolbar-icon-btn.add-btn-toolbar {
+          background: var(--accent-primary);
+          color: white;
+        }
+        .toolbar-icon-btn.add-btn-toolbar:hover {
+          background: var(--accent-secondary);
+        }
+         .toolbar-right {
+           display: flex;
+           align-items: center;
+           gap: 12px;
+          min-width: 120px;
+          justify-content: flex-end;
         }
         .search-box {
           display: flex;
@@ -691,7 +747,8 @@ export const ActionList: React.FC<ActionListProps> = ({ onEdit }) => {
           background: var(--bg-tertiary);
           padding: 8px 14px;
           border-radius: 8px;
-          width: 320px;
+          flex: 1;
+          max-width: 400px;
           color: var(--text-tertiary);
         }
         .search-box input {
