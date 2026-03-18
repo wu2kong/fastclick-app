@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Loader2, CheckCircle, XCircle, Copy, Check, Terminal, ExternalLink } from 'lucide-react';
+import { X, Loader2, CheckCircle, XCircle, Copy, Check, Terminal, ExternalLink, FileText, FolderOpen } from 'lucide-react';
 import { invoke } from '@tauri-apps/api/core';
 import type { ClickAction, ExecuteResult } from '../types';
 
@@ -70,11 +70,16 @@ export const ExecuteModal: React.FC<ExecuteModalProps> = ({
 
   const isScript = action.action.type === 'execute_script';
   const isOther = action.action.type === 'other';
+  const isOpenAction = ['open_app', 'open_file', 'open_directory'].includes(action.action.type);
 
   const getIcon = () => {
     switch (action.action.type) {
       case 'open_app':
         return <ExternalLink size={20} />;
+      case 'open_file':
+        return <FileText size={20} />;
+      case 'open_directory':
+        return <FolderOpen size={20} />;
       case 'execute_script':
         return <Terminal size={20} />;
       default:
@@ -140,18 +145,26 @@ export const ExecuteModal: React.FC<ExecuteModalProps> = ({
           </div>
         )}
 
-        {action.action.type === 'open_app' && status === 'loading' && (
+        {isOpenAction && status === 'loading' && (
           <div className="modal-body loading">
             <Loader2 className="spinner" size={32} />
-            <p>正在打开应用...</p>
+            <p>
+              {action.action.type === 'open_app' && '正在打开应用...'}
+              {action.action.type === 'open_file' && '正在打开文件...'}
+              {action.action.type === 'open_directory' && '正在打开目录...'}
+            </p>
           </div>
         )}
 
-        {action.action.type === 'open_app' && status === 'success' && (
+        {isOpenAction && status === 'success' && (
           <div className="modal-body result">
             <div className="status-indicator success">
               <CheckCircle size={24} />
-              <span>应用已打开</span>
+              <span>
+                {action.action.type === 'open_app' && '应用已打开'}
+                {action.action.type === 'open_file' && '文件已打开'}
+                {action.action.type === 'open_directory' && '目录已打开'}
+              </span>
             </div>
           </div>
         )}

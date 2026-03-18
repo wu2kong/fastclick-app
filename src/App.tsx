@@ -54,7 +54,6 @@ function App() {
 
   const handleFromApp = async () => {
     try {
-      // Open file dialog to select an application
       const selectedPath = await open({
         multiple: false,
         directory: false,
@@ -71,12 +70,10 @@ function App() {
         return;
       }
 
-      // Extract app info
       const appInfo = await invoke<AppInfo>('extract_app_info', {
         appPath: selectedPath,
       });
 
-      // Get or create "启动应用" category
       const categories = useAppStore.getState().categories;
       let launchCategoryId = categories.find(c => c.name === '启动应用')?.id;
       
@@ -90,7 +87,6 @@ function App() {
         launchCategoryId = useAppStore.getState().categories.find(c => c.name === '启动应用')?.id || '';
       }
 
-      // Create the action
       const newAction = {
         name: `打开 ${appInfo.name}`,
         action: {
@@ -112,6 +108,118 @@ function App() {
     } catch (error) {
       console.error('Failed to add app:', error);
       alert(`添加应用失败: ${error}`);
+    }
+  };
+
+  const handleFromFile = async () => {
+    try {
+      const selectedPath = await open({
+        multiple: false,
+        directory: false,
+      });
+
+      if (!selectedPath) {
+        return;
+      }
+
+      handleFromFileWithPath(selectedPath as string);
+    } catch (error) {
+      console.error('Failed to select file:', error);
+      alert(`选择文件失败: ${error}`);
+    }
+  };
+
+  const handleFromFileWithPath = async (path: string) => {
+    try {
+      const fileName = path.split('/').pop() || path.split('\\').pop() || path;
+      const categories = useAppStore.getState().categories;
+      let fileCategoryId = categories.find(c => c.name === '打开文件')?.id;
+      
+      if (!fileCategoryId) {
+        const newCategory = {
+          name: '打开文件',
+          description: '快速打开文件',
+          order: 1,
+        };
+        useAppStore.getState().addCategory(newCategory);
+        fileCategoryId = useAppStore.getState().categories.find(c => c.name === '打开文件')?.id || '';
+      }
+
+      const newAction = {
+        name: `打开 ${fileName}`,
+        action: {
+          type: 'open_file' as const,
+          value: path,
+        },
+        icon: { type: 'emoji' as const, value: '📄' },
+        categoryId: fileCategoryId,
+        tagIds: [],
+        description: `打开文件: ${fileName}`,
+        displayInGallery: true,
+        displayInMenu: true,
+        displayInCLI: true,
+      };
+
+      useAppStore.getState().addClickAction(newAction);
+    } catch (error) {
+      console.error('Failed to add file:', error);
+      alert(`添加文件失败: ${error}`);
+    }
+  };
+
+  const handleFromDirectoryWithPath = async (path: string) => {
+    try {
+      const dirName = path.split('/').pop() || path.split('\\').pop() || path;
+      const categories = useAppStore.getState().categories;
+      let fileCategoryId = categories.find(c => c.name === '打开目录')?.id;
+      
+      if (!fileCategoryId) {
+        const newCategory = {
+          name: '打开目录',
+          description: '快速打开目录',
+          order: 1,
+        };
+        useAppStore.getState().addCategory(newCategory);
+        fileCategoryId = useAppStore.getState().categories.find(c => c.name === '打开目录')?.id || '';
+      }
+
+      const newAction = {
+        name: `打开 ${dirName}`,
+        action: {
+          type: 'open_directory' as const,
+          value: path,
+        },
+        icon: { type: 'emoji' as const, value: '📁' },
+        categoryId: fileCategoryId,
+        tagIds: [],
+        description: `打开目录: ${dirName}`,
+        displayInGallery: true,
+        displayInMenu: true,
+        displayInCLI: true,
+      };
+
+      useAppStore.getState().addClickAction(newAction);
+    } catch (error) {
+      console.error('Failed to add directory:', error);
+      alert(`添加目录失败: ${error}`);
+    }
+  };
+
+  const handleFromDirectory = async () => {
+    try {
+      const selectedPath = await open({
+        multiple: false,
+        directory: true,
+      });
+
+      if (!selectedPath) {
+        return;
+      }
+
+      handleFromDirectoryWithPath(selectedPath as string);
+    } catch (error) {
+      console.error('Failed to select directory:', error);
+      alert(`选择目录失败: ${error}`);
     }
   };
 
@@ -186,6 +294,10 @@ function App() {
         onClose={handleCloseAddModal}
         onManualCreate={handleManualCreate}
         onFromApp={handleFromApp}
+        onFromFile={handleFromFile}
+        onFromDirectory={handleFromDirectory}
+        onFromFileWithPath={handleFromFileWithPath}
+        onFromDirectoryWithPath={handleFromDirectoryWithPath}
       />
       <ActionFormModal
         isOpen={isFormModalOpen}

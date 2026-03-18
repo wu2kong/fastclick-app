@@ -11,7 +11,9 @@ pub async fn execute_action_by_id(app: &AppHandle, action_id: &str) -> Result<Ex
         .ok_or_else(|| format!("未找到操作: {}", action_id))?;
     
     match action.action_data.action_type.as_str() {
-        "open_app" => execute_open_app(&action.action_data.value, app).await,
+        "open_app" | "open_file" | "open_directory" => {
+            execute_open_app(&action.action_data.value, app).await
+        }
         "execute_script" => {
             execute_script(
                 &action.action_data.value,
@@ -31,7 +33,9 @@ pub async fn execute_action(
     app: AppHandle,
 ) -> Result<ExecuteResult, String> {
     match action_type.as_str() {
-        "open_app" => execute_open_app(&action_value, &app).await,
+        "open_app" | "open_file" | "open_directory" => {
+            execute_open_app(&action_value, &app).await
+        }
         "execute_script" => execute_script(&action_value, params, &app).await,
         _ => Err(format!("未知操作类型: {}", action_type)),
     }

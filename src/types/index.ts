@@ -16,7 +16,7 @@ export interface ClickAction {
   id: string;
   name: string;
   action: {
-    type: 'open_app' | 'execute_script' | 'other';
+    type: 'open_app' | 'open_file' | 'open_directory' | 'execute_script' | 'other';
     value: string;
     params?: ScriptExecutionParams;
   };
