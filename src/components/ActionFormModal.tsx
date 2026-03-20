@@ -146,6 +146,7 @@ export const ActionFormModal: React.FC<ActionFormModalProps> = ({
               <select
                 value={formData.actionType}
                 onChange={(e) => setFormData({ ...formData, actionType: e.target.value as any })}
+                style={{ height: '39px' }}
               >
                 <option value="open_app">打开应用程序</option>
                 <option value="open_file">打开文件</option>
@@ -188,6 +189,7 @@ export const ActionFormModal: React.FC<ActionFormModalProps> = ({
                 value={formData.categoryId}
                 onChange={(e) => setFormData({ ...formData, categoryId: e.target.value })}
                 required
+                style={{ height: '39px' }}
               >
                 {categories.map((cat) => (
                   <option key={cat.id} value={cat.id}>{cat.name}</option>
