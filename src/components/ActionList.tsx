@@ -3,7 +3,7 @@ import {
   LayoutGrid, List, Search, Play, 
   Edit2, Trash2, ExternalLink, Terminal, AlertTriangle, GripVertical, LayoutPanelLeft,
   ArrowDownUp, ArrowUpDown, ArrowDownAZ, ArrowUpZA, Clock, ArrowDownWideNarrow, ArrowUpWideNarrow,
-  Menu, Settings, Plus, ChevronDown, ChevronUp
+  Menu, Settings, Plus, ChevronDown, ChevronUp, CheckSquare, Square, FolderOpen, Tag
 } from 'lucide-react';
 import { useAppStore } from '../stores/appStore';
 import type { ClickAction, SortField } from '../types';
@@ -123,6 +123,9 @@ interface SortableActionCardProps {
   onExecute: (action: ClickAction) => void;
   getCategoryName: (categoryId: string) => string;
   getTagNames: (tagIds: string[]) => string;
+  batchMode?: boolean;
+  selectedActionIds?: Set<string>;
+  onToggleSelection?: (id: string) => void;
 }
 
 const SortableActionCard: React.FC<SortableActionCardProps> = ({
@@ -132,6 +135,9 @@ const SortableActionCard: React.FC<SortableActionCardProps> = ({
   onExecute,
   getCategoryName,
   getTagNames,
+  batchMode,
+  selectedActionIds,
+  onToggleSelection,
 }) => {
   const {
     attributes,
@@ -148,9 +154,22 @@ const SortableActionCard: React.FC<SortableActionCardProps> = ({
     opacity: isDragging ? 0.5 : 1,
   };
 
+  const isSelected = selectedActionIds?.has(action.id);
+
   return (
-    <div ref={setNodeRef} style={style} className="action-card sortable-action-card" onClick={() => onExecute(action)}>
+    <div ref={setNodeRef} style={style} className={`action-card sortable-action-card ${isSelected ? 'selected' : ''}`} onClick={() => {
+      if (batchMode && onToggleSelection) {
+        onToggleSelection(action.id);
+      } else {
+        onExecute(action);
+      }
+    }}>
       <div className="card-header">
+        {batchMode && (
+          <div className="batch-checkbox" onClick={(e) => e.stopPropagation()}>
+            {isSelected ? <CheckSquare size={20} className="checkbox-icon checked" /> : <Square size={20} className="checkbox-icon" />}
+          </div>
+        )}
         <div className="drag-handle" {...attributes} {...listeners} onClick={(e) => e.stopPropagation()}>
           <GripVertical size={16} />
         </div>
@@ -247,6 +266,9 @@ interface GalleryCardProps {
   onEdit: (action: ClickAction) => void;
   onDelete: (action: ClickAction) => void;
   onExecute: (action: ClickAction) => void;
+  batchMode?: boolean;
+  selectedActionIds?: Set<string>;
+  onToggleSelection?: (id: string) => void;
 }
 
 const GalleryCard: React.FC<GalleryCardProps> = ({
@@ -254,6 +276,9 @@ const GalleryCard: React.FC<GalleryCardProps> = ({
   onEdit,
   onDelete,
   onExecute,
+  batchMode,
+  selectedActionIds,
+  onToggleSelection,
 }) => {
   const {
     attributes,
@@ -272,13 +297,17 @@ const GalleryCard: React.FC<GalleryCardProps> = ({
     opacity: isDragging ? 0.5 : 1,
   };
 
+  const isSelected = selectedActionIds?.has(action.id);
+
   const handleContextMenu = (e: React.MouseEvent) => {
     e.preventDefault();
     setContextMenu({ x: e.clientX, y: e.clientY });
   };
 
   const handleClick = (e: React.MouseEvent) => {
-    if (!contextMenu && e.button === 0) {
+    if (batchMode && onToggleSelection) {
+      onToggleSelection(action.id);
+    } else if (!contextMenu && e.button === 0) {
       onExecute(action);
     }
   };
@@ -288,12 +317,17 @@ const GalleryCard: React.FC<GalleryCardProps> = ({
       <div
         ref={setNodeRef}
         style={style}
-        className="gallery-card"
+        className={`gallery-card ${isSelected ? 'selected' : ''}`}
         onClick={handleClick}
         onContextMenu={handleContextMenu}
         {...attributes}
         {...listeners}
       >
+        {batchMode && (
+          <div className="gallery-checkbox">
+            {isSelected ? <CheckSquare size={16} className="checkbox-icon checked" /> : <Square size={16} className="checkbox-icon" />}
+          </div>
+        )}
         <div className="gallery-icon">
           {getActionIcon(action, 48)}
         </div>
@@ -338,6 +372,15 @@ export const ActionList: React.FC<ActionListProps> = ({ onEdit, onAddClick, onSe
     tagFilterExpanded,
     setTagFilterExpanded,
     clickActions,
+    batchMode,
+    selectedActionIds,
+    setBatchMode,
+    toggleActionSelection,
+    selectAllActions,
+    invertSelection,
+    batchDeleteActions,
+    batchUpdateCategory,
+    batchAddTags,
   } = useAppStore();
 
   const [deleteConfirm, setDeleteConfirm] = useState<{ isOpen: false; action: ClickAction | null } | { isOpen: true; action: ClickAction }>({
@@ -352,6 +395,15 @@ export const ActionList: React.FC<ActionListProps> = ({ onEdit, onAddClick, onSe
 
   const [showSortMenu, setShowSortMenu] = useState(false);
   const sortMenuRef = useRef<HTMLDivElement>(null);
+
+  const [batchDeleteConfirm, setBatchDeleteConfirm] = useState(false);
+  const [showCategoryModal, setShowCategoryModal] = useState(false);
+  const [showTagsModal, setShowTagsModal] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<string>('');
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [newTagName, setNewTagName] = useState('');
+
+  const { addTag } = useAppStore();
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -459,6 +511,8 @@ export const ActionList: React.FC<ActionListProps> = ({ onEdit, onAddClick, onSe
   ];
 
   const renderActionCard = (action: ClickAction) => {
+    const isSelected = selectedActionIds.has(action.id);
+
     if (canDragSort) {
       return (
         <SortableActionCard
@@ -469,13 +523,27 @@ export const ActionList: React.FC<ActionListProps> = ({ onEdit, onAddClick, onSe
           onExecute={handleExecute}
           getCategoryName={getCategoryName}
           getTagNames={getTagNames}
+          batchMode={batchMode}
+          selectedActionIds={selectedActionIds}
+          onToggleSelection={toggleActionSelection}
         />
       );
     }
 
     return (
-      <div key={action.id} className="action-card" onClick={() => handleExecute(action)}>
+      <div key={action.id} className={`action-card ${isSelected ? 'selected' : ''}`} onClick={() => {
+        if (batchMode) {
+          toggleActionSelection(action.id);
+        } else {
+          handleExecute(action);
+        }
+      }}>
         <div className="card-header">
+          {batchMode && (
+            <div className="batch-checkbox" onClick={(e) => e.stopPropagation()}>
+              {isSelected ? <CheckSquare size={20} className="checkbox-icon checked" /> : <Square size={20} className="checkbox-icon" />}
+            </div>
+          )}
           <div className="icon-wrapper">
             {getActionIcon(action)}
           </div>
@@ -531,7 +599,7 @@ export const ActionList: React.FC<ActionListProps> = ({ onEdit, onAddClick, onSe
     }
 
     if (viewMode === 'gallery') {
-      if (canDragSort) {
+      if (canDragSort && !batchMode) {
         return (
           <DndContext
             sensors={sensors}
@@ -549,6 +617,9 @@ export const ActionList: React.FC<ActionListProps> = ({ onEdit, onAddClick, onSe
                   onEdit={onEdit}
                   onDelete={(a) => setDeleteConfirm({ isOpen: true, action: a })}
                   onExecute={handleExecute}
+                  batchMode={batchMode}
+                  selectedActionIds={selectedActionIds}
+                  onToggleSelection={toggleActionSelection}
                 />
               ))}
             </SortableContext>
@@ -562,11 +633,14 @@ export const ActionList: React.FC<ActionListProps> = ({ onEdit, onAddClick, onSe
           onEdit={onEdit}
           onDelete={(a) => setDeleteConfirm({ isOpen: true, action: a })}
           onExecute={handleExecute}
+          batchMode={batchMode}
+          selectedActionIds={selectedActionIds}
+          onToggleSelection={toggleActionSelection}
         />
       ));
     }
 
-    if (canDragSort) {
+    if (canDragSort && !batchMode) {
       return (
         <DndContext
           sensors={sensors}
@@ -618,75 +692,94 @@ export const ActionList: React.FC<ActionListProps> = ({ onEdit, onAddClick, onSe
           />
         </div>
         <div className="toolbar-right">
-          <div className="sort-control" ref={sortMenuRef}>
-            <button
-              className="sort-toggle-btn"
-              onClick={() => setShowSortMenu(!showSortMenu)}
-              title={`${sortFieldOptions.find(o => o.field === sortField)?.label} - ${sortOrder === 'asc' ? '升序' : '降序'}`}
-            >
-              {getSortIcon(sortField, sortOrder)}
-            </button>
-            {showSortMenu && (
-              <div className="sort-menu">
-                <div className="sort-menu-header">
-                  <span>排序方式</span>
-                </div>
-                {sortFieldOptions.map((option) => (
-                  <button
-                    key={option.field}
-                    className={`sort-menu-item ${sortField === option.field ? 'active' : ''}`}
-                    onClick={() => {
-                      if (sortField === option.field) {
-                        setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
-                      } else {
-                        setSortField(option.field);
-                      }
-                      setShowSortMenu(false);
-                    }}
-                  >
-                    <div className="sort-menu-item-content">
-                      {getSortIcon(option.field, 'asc', 16)}
-                      <span>{option.label}</span>
+          {!batchMode && (
+            <>
+              <button
+                className="batch-mode-btn"
+                onClick={() => setBatchMode(true)}
+                title="批量管理"
+              >
+                <CheckSquare size={18} />
+              </button>
+              <div className="sort-control" ref={sortMenuRef}>
+                <button
+                  className="sort-toggle-btn"
+                  onClick={() => setShowSortMenu(!showSortMenu)}
+                  title={`${sortFieldOptions.find(o => o.field === sortField)?.label} - ${sortOrder === 'asc' ? '升序' : '降序'}`}
+                >
+                  {getSortIcon(sortField, sortOrder)}
+                </button>
+                {showSortMenu && (
+                  <div className="sort-menu">
+                    <div className="sort-menu-header">
+                      <span>排序方式</span>
                     </div>
-                    {sortField === option.field && (
-                      <span className="check-icon">✓</span>
-                    )}
-                  </button>
-                ))}
+                    {sortFieldOptions.map((option) => (
+                      <button
+                        key={option.field}
+                        className={`sort-menu-item ${sortField === option.field ? 'active' : ''}`}
+                        onClick={() => {
+                          if (sortField === option.field) {
+                            setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+                          } else {
+                            setSortField(option.field);
+                          }
+                          setShowSortMenu(false);
+                        }}
+                      >
+                        <div className="sort-menu-item-content">
+                          {getSortIcon(option.field, 'asc', 16)}
+                          <span>{option.label}</span>
+                        </div>
+                        {sortField === option.field && (
+                          <span className="check-icon">✓</span>
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
-            )}
-          </div>
-          <div className="view-toggle">
-            <button
-              className={viewMode === 'list' ? 'active' : ''}
-              onClick={() => setViewMode('list')}
-              title="列表视图"
-            >
-              <List size={18} />
-            </button>
-            <button
-              className={viewMode === 'grid' ? 'active' : ''}
-              onClick={() => setViewMode('grid')}
-              title="网格视图"
-            >
-              <LayoutPanelLeft size={18} />
-            </button>
-            <button
-              className={viewMode === 'gallery' ? 'active' : ''}
-              onClick={() => setViewMode('gallery')}
-              title="画廊视图"
-            >
-              <LayoutGrid size={18} />
-            </button>
-          </div>
-          {selectedCategoryId && categoryTagStats.length > 1 && (
-            <button
-              className="tag-filter-toggle-btn"
-              onClick={() => setTagFilterExpanded(!tagFilterExpanded)}
-              title={tagFilterExpanded ? '收起标签筛选' : '展开标签筛选'}
-            >
-              {tagFilterExpanded ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
-            </button>
+              <div className="view-toggle">
+                <button
+                  className={viewMode === 'list' ? 'active' : ''}
+                  onClick={() => setViewMode('list')}
+                  title="列表视图"
+                >
+                  <List size={18} />
+                </button>
+                <button
+                  className={viewMode === 'grid' ? 'active' : ''}
+                  onClick={() => setViewMode('grid')}
+                  title="网格视图"
+                >
+                  <LayoutPanelLeft size={18} />
+                </button>
+                <button
+                  className={viewMode === 'gallery' ? 'active' : ''}
+                  onClick={() => setViewMode('gallery')}
+                  title="画廊视图"
+                >
+                  <LayoutGrid size={18} />
+                </button>
+              </div>
+              {selectedCategoryId && categoryTagStats.length > 1 && (
+                <button
+                  className="tag-filter-toggle-btn"
+                  onClick={() => setTagFilterExpanded(!tagFilterExpanded)}
+                  title={tagFilterExpanded ? '收起标签筛选' : '展开标签筛选'}
+                >
+                  {tagFilterExpanded ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+                </button>
+              )}
+            </>
+          )}
+          {batchMode && (
+            <div className="batch-mode-controls">
+              <span className="batch-count">已选中 {selectedActionIds.size} 个</span>
+              <button className="batch-action-btn" onClick={selectAllActions}>全选</button>
+              <button className="batch-action-btn" onClick={invertSelection}>反选</button>
+              <button className="batch-action-btn cancel" onClick={() => setBatchMode(false)}>取消</button>
+            </div>
           )}
         </div>
       </div>
@@ -704,6 +797,40 @@ export const ActionList: React.FC<ActionListProps> = ({ onEdit, onAddClick, onSe
                 <span className="tag-count">{count}</span>
               </button>
             ))}
+          </div>
+        </div>
+      )}
+
+      {batchMode && (
+        <div className="batch-operations-bar">
+          <div className="batch-operations-left">
+            <span className="batch-operations-label">批量操作：</span>
+          </div>
+          <div className="batch-operations-right">
+            <button
+              className="batch-operation-btn delete"
+              onClick={() => setBatchDeleteConfirm(true)}
+              disabled={selectedActionIds.size === 0}
+            >
+              <Trash2 size={16} />
+              <span>批量删除</span>
+            </button>
+            <button
+              className="batch-operation-btn"
+              onClick={() => setShowCategoryModal(true)}
+              disabled={selectedActionIds.size === 0}
+            >
+              <FolderOpen size={16} />
+              <span>修改分类</span>
+            </button>
+            <button
+              className="batch-operation-btn"
+              onClick={() => setShowTagsModal(true)}
+              disabled={selectedActionIds.size === 0}
+            >
+              <Tag size={16} />
+              <span>添加标签</span>
+            </button>
           </div>
         </div>
       )}
@@ -735,6 +862,167 @@ export const ActionList: React.FC<ActionListProps> = ({ onEdit, onAddClick, onSe
                 }}
               >
                 删除
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {batchDeleteConfirm && (
+        <div className="delete-modal-overlay" onClick={() => setBatchDeleteConfirm(false)}>
+          <div className="delete-modal batch-delete-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="delete-modal-icon">
+              <AlertTriangle size={32} />
+            </div>
+            <h3>确认批量删除</h3>
+            <p>确定要删除选中的 {selectedActionIds.size} 个小程序吗？此操作无法撤销。</p>
+            <p className="batch-delete-warning">删除后，相关数据将被永久移除，包括：</p>
+            <ul className="batch-delete-list">
+              <li>小程序配置信息</li>
+              <li>执行次数统计数据</li>
+              <li>分类和标签关联</li>
+            </ul>
+            <div className="delete-modal-actions">
+              <button
+                className="btn-cancel"
+                onClick={() => setBatchDeleteConfirm(false)}
+              >
+                取消
+              </button>
+              <button
+                className="btn-delete"
+                onClick={() => {
+                  batchDeleteActions();
+                  setBatchDeleteConfirm(false);
+                }}
+              >
+                删除
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showCategoryModal && (
+        <div className="delete-modal-overlay" onClick={() => setShowCategoryModal(false)}>
+          <div className="category-modal" onClick={(e) => e.stopPropagation()}>
+            <h3>修改分类</h3>
+            <p>选择要将选中的 {selectedActionIds.size} 个小程序移动到的分类：</p>
+            <div className="category-list">
+              {categories.map((category) => (
+                <button
+                  key={category.id}
+                  className={`category-option ${selectedCategory === category.id ? 'active' : ''}`}
+                  onClick={() => setSelectedCategory(category.id)}
+                >
+                  {category.name}
+                </button>
+              ))}
+            </div>
+            <div className="delete-modal-actions">
+              <button
+                className="btn-cancel"
+                onClick={() => {
+                  setShowCategoryModal(false);
+                  setSelectedCategory('');
+                }}
+              >
+                取消
+              </button>
+              <button
+                className="btn-delete"
+                onClick={() => {
+                  if (selectedCategory) {
+                    batchUpdateCategory(selectedCategory);
+                    setShowCategoryModal(false);
+                    setSelectedCategory('');
+                  }
+                }}
+                disabled={!selectedCategory}
+              >
+                确定
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showTagsModal && (
+        <div className="delete-modal-overlay" onClick={() => {
+          setShowTagsModal(false);
+          setSelectedTags([]);
+          setNewTagName('');
+        }}>
+          <div className="tags-modal" onClick={(e) => e.stopPropagation()}>
+            <h3>添加标签</h3>
+            <p>为选中的 {selectedActionIds.size} 个小程序添加标签：</p>
+            <div className="tags-list">
+              {tags.map((tag) => (
+                <button
+                  key={tag.id}
+                  className={`tag-option ${selectedTags.includes(tag.id) ? 'active' : ''}`}
+                  onClick={() => {
+                    setSelectedTags(prev => 
+                      prev.includes(tag.id) 
+                        ? prev.filter(id => id !== tag.id)
+                        : [...prev, tag.id]
+                    );
+                  }}
+                >
+                  {tag.name}
+                </button>
+              ))}
+            </div>
+            <input
+              type="text"
+              className="new-tag-input"
+              placeholder="+新标签，按回车添加"
+              value={newTagName}
+              onChange={(e) => setNewTagName(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  const trimmedName = newTagName.trim();
+                  if (trimmedName) {
+                    const colors = ['#ef4444', '#f97316', '#eab308', '#22c55e', '#14b8a6', '#3b82f6', '#8b5cf6', '#ec4899'];
+                    const randomColor = colors[Math.floor(Math.random() * colors.length)];
+                    const newTagId = addTag({
+                      name: trimmedName,
+                      parentId: null,
+                      description: '',
+                      color: randomColor,
+                      order: 0,
+                    });
+                    setSelectedTags(prev => [...prev, newTagId]);
+                    setNewTagName('');
+                  }
+                }
+              }}
+            />
+            <div className="delete-modal-actions">
+              <button
+                className="btn-cancel"
+                onClick={() => {
+                  setShowTagsModal(false);
+                  setSelectedTags([]);
+                  setNewTagName('');
+                }}
+              >
+                取消
+              </button>
+              <button
+                className="btn-delete"
+                onClick={() => {
+                  if (selectedTags.length > 0) {
+                    batchAddTags(selectedTags);
+                    setShowTagsModal(false);
+                    setSelectedTags([]);
+                    setNewTagName('');
+                  }
+                }}
+                disabled={selectedTags.length === 0}
+              >
+                确定
               </button>
             </div>
           </div>
@@ -797,14 +1085,62 @@ export const ActionList: React.FC<ActionListProps> = ({ onEdit, onAddClick, onSe
         .toolbar-icon-btn.add-btn-toolbar:hover {
           background: var(--accent-secondary);
         }
-         .toolbar-right {
-           display: flex;
-           align-items: center;
-           gap: 12px;
-          min-width: 120px;
-          justify-content: flex-end;
+.toolbar-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+           min-width: 120px;
+           justify-content: flex-end;
+         }
+         .batch-mode-btn {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 6px;
+          border: none;
+          background: transparent;
+          cursor: pointer;
+          border-radius: 4px;
+          color: var(--text-tertiary);
+          transition: all 0.15s;
         }
-        .search-box {
+        .batch-mode-btn:hover {
+          background: var(--bg-tertiary);
+          color: var(--text-secondary);
+        }
+        .batch-mode-controls {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+        }
+        .batch-count {
+          font-size: 13px;
+          color: var(--text-secondary);
+          font-weight: 500;
+        }
+        .batch-action-btn {
+          padding: 6px 12px;
+          border: 1px solid var(--border-primary);
+          background: var(--bg-primary);
+          color: var(--text-secondary);
+          font-size: 13px;
+          border-radius: 6px;
+          cursor: pointer;
+          transition: all 0.15s;
+        }
+        .batch-action-btn:hover {
+          background: var(--bg-tertiary);
+          border-color: var(--border-secondary);
+        }
+        .batch-action-btn.cancel {
+          background: var(--danger-text);
+          color: white;
+          border-color: var(--danger-text);
+        }
+        .batch-action-btn.cancel:hover {
+          background: #b91c1c;
+        }
+         .search-box {
           display: flex;
           align-items: center;
           gap: 10px;
@@ -1318,6 +1654,167 @@ export const ActionList: React.FC<ActionListProps> = ({ onEdit, onAddClick, onSe
         .context-menu .menu-item.delete:hover {
           background: var(--danger-bg);
           color: var(--danger-text);
+        }
+        .batch-operations-bar {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 10px 24px;
+          background: var(--bg-secondary);
+          border-bottom: 1px solid var(--border-primary);
+        }
+        .batch-operations-left {
+          display: flex;
+          align-items: center;
+        }
+        .batch-operations-label {
+          font-size: 13px;
+          color: var(--text-secondary);
+          font-weight: 500;
+        }
+        .batch-operations-right {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+        .batch-operation-btn {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          padding: 8px 14px;
+          border: 1px solid var(--border-primary);
+          background: var(--bg-primary);
+          color: var(--text-secondary);
+          font-size: 13px;
+          border-radius: 6px;
+          cursor: pointer;
+          transition: all 0.15s;
+        }
+        .batch-operation-btn:hover:not(:disabled) {
+          background: var(--bg-tertiary);
+          border-color: var(--border-secondary);
+        }
+        .batch-operation-btn:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+        }
+        .batch-operation-btn.delete:hover:not(:disabled) {
+          background: var(--danger-bg);
+          border-color: var(--danger-text);
+          color: var(--danger-text);
+        }
+        .action-card.selected {
+          border-color: var(--accent-primary);
+          background: var(--accent-bg);
+        }
+        .batch-checkbox {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 4px;
+          cursor: pointer;
+        }
+        .checkbox-icon {
+          color: var(--border-secondary);
+          transition: color 0.15s;
+        }
+        .checkbox-icon.checked {
+          color: var(--accent-primary);
+        }
+        .gallery-card.selected {
+          border-color: var(--accent-primary);
+          background: var(--accent-bg);
+        }
+        .gallery-checkbox {
+          position: absolute;
+          top: 4px;
+          left: 4px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        .batch-delete-modal {
+          max-width: 400px;
+        }
+        .batch-delete-warning {
+          font-size: 13px;
+          color: var(--text-tertiary);
+          margin: 12px 0 8px;
+          font-weight: 500;
+        }
+        .batch-delete-list {
+          text-align: left;
+          font-size: 12px;
+          color: var(--text-muted);
+          margin: 0 0 20px;
+          padding-left: 20px;
+        }
+        .batch-delete-list li {
+          margin-bottom: 4px;
+        }
+        .category-modal, .tags-modal {
+          background: var(--bg-primary);
+          border-radius: 12px;
+          padding: 24px;
+          width: 360px;
+          text-align: center;
+          box-shadow: var(--shadow-md);
+        }
+        .category-modal h3, .tags-modal h3 {
+          margin: 0 0 12px;
+          font-size: 18px;
+          font-weight: 600;
+          color: var(--text-primary);
+        }
+        .category-modal p, .tags-modal p {
+          margin: 0 0 16px;
+          font-size: 14px;
+          color: var(--text-tertiary);
+        }
+        .category-list, .tags-list {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 8px;
+          margin-bottom: 20px;
+          max-height: 200px;
+          overflow-y: auto;
+        }
+        .category-option, .tag-option {
+          padding: 8px 16px;
+          border: 1px solid var(--border-primary);
+          background: var(--bg-tertiary);
+          color: var(--text-secondary);
+          font-size: 13px;
+          border-radius: 6px;
+          cursor: pointer;
+          transition: all 0.15s;
+        }
+        .category-option:hover, .tag-option:hover {
+          background: var(--bg-hover);
+          border-color: var(--border-secondary);
+        }
+        .category-option.active, .tag-option.active {
+          background: var(--accent-bg);
+          border-color: var(--accent-primary);
+          color: var(--accent-primary);
+        }
+        .new-tag-input {
+          // width: 100%;
+          padding: 8px 12px;
+          border: 1.5px dashed var(--border-secondary);
+          border-radius: 6px;
+          font-size: 13px;
+          background: transparent;
+          color: var(--text-secondary);
+          margin-bottom: 20px;
+          transition: all 0.15s;
+        }
+        .new-tag-input:focus {
+          outline: none;
+          border-color: var(--accent-primary);
+        }
+        .new-tag-input::placeholder {
+          color: var(--text-tertiary);
         }
       `}</style>
     </div>

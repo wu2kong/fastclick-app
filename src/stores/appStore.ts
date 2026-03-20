@@ -18,6 +18,8 @@ interface AppState {
   sidebarCollapsed: boolean;
   isLoading: boolean;
   isInitialized: boolean;
+  batchMode: boolean;
+  selectedActionIds: Set<string>;
   
   setClickActions: (actions: ClickAction[]) => void;
   addClickAction: (action: Omit<ClickAction, 'id' | 'createdAt' | 'updatedAt' | 'executionCount' | 'order'> & { order?: number }) => void;
@@ -56,6 +58,15 @@ interface AppState {
   
   initializeStore: () => Promise<void>;
   saveToStorage: () => Promise<void>;
+  
+  setBatchMode: (enabled: boolean) => void;
+  toggleActionSelection: (id: string) => void;
+  selectAllActions: () => void;
+  invertSelection: () => void;
+  clearSelection: () => void;
+  batchDeleteActions: () => void;
+  batchUpdateCategory: (categoryId: string) => void;
+  batchAddTags: (tagIds: string[]) => void;
 }
 
 const generateId = () => Math.random().toString(36).substring(2, 9);
@@ -83,6 +94,8 @@ export const useAppStore = create<AppState>((set, get) => ({
   sidebarCollapsed: false,
   isLoading: false,
   isInitialized: false,
+  batchMode: false,
+  selectedActionIds: new Set<string>(),
 
   setClickActions: (actions) => {
     set({ clickActions: actions });
@@ -461,5 +474,80 @@ export const useAppStore = create<AppState>((set, get) => ({
     } catch (error) {
       console.error('Failed to save to storage:', error);
     }
+  },
+
+  setBatchMode: (enabled) => {
+    set({ batchMode: enabled, selectedActionIds: new Set<string>() });
+  },
+
+  toggleActionSelection: (id) => {
+    set((state) => {
+      const newSet = new Set(state.selectedActionIds);
+      if (newSet.has(id)) {
+        newSet.delete(id);
+      } else {
+        newSet.add(id);
+      }
+      return { selectedActionIds: newSet };
+    });
+  },
+
+  selectAllActions: () => {
+    const filtered = get().getFilteredActions();
+    set({ selectedActionIds: new Set(filtered.map(a => a.id)) });
+  },
+
+  invertSelection: () => {
+    const filtered = get().getFilteredActions();
+    const currentSelected = get().selectedActionIds;
+    const newSet = new Set<string>();
+    filtered.forEach(a => {
+      if (!currentSelected.has(a.id)) {
+        newSet.add(a.id);
+      }
+    });
+    set({ selectedActionIds: newSet });
+  },
+
+  clearSelection: () => {
+    set({ selectedActionIds: new Set<string>() });
+  },
+
+  batchDeleteActions: () => {
+    set((state) => ({
+      clickActions: state.clickActions.filter(a => !state.selectedActionIds.has(a.id)),
+      selectedActionIds: new Set<string>(),
+    }));
+    setTimeout(async () => {
+      await get().saveToStorage();
+      await refreshTrayMenu();
+    }, 0);
+  },
+
+  batchUpdateCategory: (categoryId) => {
+    set((state) => ({
+      clickActions: state.clickActions.map(a =>
+        state.selectedActionIds.has(a.id)
+          ? { ...a, categoryId, updatedAt: Date.now() }
+          : a
+      ),
+      selectedActionIds: new Set<string>(),
+    }));
+    setTimeout(async () => {
+      await get().saveToStorage();
+      await refreshTrayMenu();
+    }, 0);
+  },
+
+  batchAddTags: (tagIds) => {
+    set((state) => ({
+      clickActions: state.clickActions.map(a =>
+        state.selectedActionIds.has(a.id)
+          ? { ...a, tagIds: [...new Set([...a.tagIds, ...tagIds])], updatedAt: Date.now() }
+          : a
+      ),
+      selectedActionIds: new Set<string>(),
+    }));
+    setTimeout(() => get().saveToStorage(), 0);
   },
 }));
