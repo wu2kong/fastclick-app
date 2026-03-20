@@ -76,16 +76,16 @@ function App() {
       });
 
       const categories = useAppStore.getState().categories;
-      let launchCategoryId = categories.find(c => c.name === '启动应用')?.id;
+      let launchCategoryId = categories.find(c => c.name === '打开应用')?.id;
       
       if (!launchCategoryId) {
         const newCategory = {
-          name: '启动应用',
-          description: '快速启动应用程序',
+          name: '打开应用',
+          description: '快速打开应用程序',
           order: 0,
         };
         useAppStore.getState().addCategory(newCategory);
-        launchCategoryId = useAppStore.getState().categories.find(c => c.name === '启动应用')?.id || '';
+        launchCategoryId = useAppStore.getState().categories.find(c => c.name === '打开应用')?.id || '';
       }
 
       const newAction = {

@@ -14,7 +14,9 @@ export const ActionFormModal: React.FC<ActionFormModalProps> = ({
   onClose,
   editAction,
 }) => {
-  const { categories, tags, addClickAction, updateClickAction } = useAppStore();
+  const { categories, tags, addClickAction, updateClickAction, addTag } = useAppStore();
+  
+  const [newTagName, setNewTagName] = useState('');
   
   const [formData, setFormData] = useState<{
     name: string;
@@ -236,6 +238,35 @@ export const ActionFormModal: React.FC<ActionFormModalProps> = ({
                   {tag.name}
                 </button>
               ))}
+              <input
+                type="text"
+                className="tag-input"
+                placeholder="+ 新标签，按回车添加"
+                value={newTagName}
+                onChange={(e) => setNewTagName(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    const trimmedName = newTagName.trim();
+                    if (trimmedName) {
+                      const colors = ['#ef4444', '#f97316', '#eab308', '#22c55e', '#14b8a6', '#3b82f6', '#8b5cf6', '#ec4899'];
+                      const randomColor = colors[Math.floor(Math.random() * colors.length)];
+                      const newTagId = addTag({
+                        name: trimmedName,
+                        parentId: null,
+                        description: '',
+                        color: randomColor,
+                        order: 0,
+                      });
+                      setFormData((prev) => ({
+                        ...prev,
+                        tagIds: [...prev.tagIds, newTagId],
+                      }));
+                      setNewTagName('');
+                    }
+                  }
+                }}
+              />
             </div>
           </div>
 
@@ -414,6 +445,25 @@ export const ActionFormModal: React.FC<ActionFormModalProps> = ({
         }
         .tag-option:hover {
           opacity: 0.8;
+        }
+        .tag-input {
+          padding: 6px 12px;
+          border: 1.5px dashed var(--border-secondary);
+          border-radius: 16px;
+          font-size: 13px;
+          background: transparent;
+          color: var(--text-secondary);
+          width: 80px;
+          min-width: 80px;
+          transition: all 0.15s;
+        }
+        .tag-input:focus {
+          outline: none;
+          border-color: var(--accent-primary);
+          width: 120px;
+        }
+        .tag-input::placeholder {
+          color: var(--text-tertiary);
         }
         .checkbox-group {
           display: flex;

@@ -37,7 +37,7 @@ const defaultAppConfig: AppConfig = {
 };
 
 const defaultCategories: Category[] = [
-  { id: 'cat-1', name: '启动应用', description: '快速启动应用程序', icon: 'rocket', order: 0, createdAt: Date.now() },
+  { id: 'cat-1', name: '打开应用', description: '快速打开应用程序', icon: 'rocket', order: 0, createdAt: Date.now() },
   { id: 'cat-2', name: '执行脚本', description: '运行自定义脚本', icon: 'terminal', order: 1, createdAt: Date.now() },
   { id: 'cat-3', name: '执行操作', description: '执行系统操作', icon: 'zap', order: 2, createdAt: Date.now() },
 ];

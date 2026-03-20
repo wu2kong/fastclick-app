@@ -31,7 +31,7 @@ interface AppState {
   deleteCategory: (id: string) => void;
   
   setTags: (tags: Tag[]) => void;
-  addTag: (tag: Omit<Tag, 'id' | 'createdAt'>) => void;
+  addTag: (tag: Omit<Tag, 'id' | 'createdAt'>) => string;
   updateTag: (id: string, tag: Partial<Tag>) => void;
   deleteTag: (id: string) => void;
   reorderCategories: (fromIndex: number, toIndex: number) => void;
@@ -173,7 +173,9 @@ export const useAppStore = create<AppState>((set, get) => ({
   deleteCategory: (id) => {
     set((state) => ({
       categories: state.categories.filter((c) => c.id !== id),
-      clickActions: state.clickActions.filter((a) => a.categoryId !== id),
+      clickActions: state.clickActions.map((a) =>
+        a.categoryId === id ? { ...a, categoryId: '' } : a
+      ),
     }));
     setTimeout(async () => {
       await get().saveToStorage();
@@ -187,14 +189,16 @@ export const useAppStore = create<AppState>((set, get) => ({
   },
   
   addTag: (tag) => {
+    const id = generateId();
     const newTag: Tag = {
       ...tag,
-      id: generateId(),
+      id,
       createdAt: Date.now(),
       order: tag.order ?? get().tags.filter(t => t.parentId === tag.parentId).length,
     };
     set((state) => ({ tags: [...state.tags, newTag] }));
     setTimeout(() => get().saveToStorage(), 0);
+    return id;
   },
   
   updateTag: (id, tag) => {
