@@ -209,13 +209,29 @@ export const useAppStore = create<AppState>((set, get) => ({
   },
   
   deleteTag: (id) => {
-    set((state) => ({
-      tags: state.tags.filter((t) => t.id !== id),
-      clickActions: state.clickActions.map((a) => ({
-        ...a,
-        tagIds: a.tagIds.filter((tid) => tid !== id),
-      })),
-    }));
+    const deleteTagRecursive = (tagId: string, tags: Tag[]): Tag[] => {
+      const childTags = tags.filter((t) => t.parentId === tagId);
+      let remainingTags = tags.filter((t) => t.id !== tagId);
+      for (const child of childTags) {
+        remainingTags = deleteTagRecursive(child.id, remainingTags);
+      }
+      return remainingTags;
+    };
+
+    set((state) => {
+      const remainingTags = deleteTagRecursive(id, state.tags);
+      const deletedTagIds = state.tags
+        .filter((t) => !remainingTags.some((rt) => rt.id === t.id))
+        .map((t) => t.id);
+
+      return {
+        tags: remainingTags,
+        clickActions: state.clickActions.map((a) => ({
+          ...a,
+          tagIds: a.tagIds.filter((tid) => !deletedTagIds.includes(tid)),
+        })),
+      };
+    });
     setTimeout(() => get().saveToStorage(), 0);
   },
 

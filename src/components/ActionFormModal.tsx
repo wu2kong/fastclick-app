@@ -453,7 +453,7 @@ export const ActionFormModal: React.FC<ActionFormModalProps> = ({
           font-size: 13px;
           background: transparent;
           color: var(--text-secondary);
-          width: 80px;
+          width: 160px;
           min-width: 80px;
           transition: all 0.15s;
         }
