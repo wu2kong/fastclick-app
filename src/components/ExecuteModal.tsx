@@ -21,6 +21,8 @@ export const ExecuteModal: React.FC<ExecuteModalProps> = ({
   const [copiedField, setCopiedField] = useState<string | null>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
 
+  const isOpenAction = action ? ['open_app', 'open_file', 'open_directory', 'open_url'].includes(action.action.type) : false;
+
   useEffect(() => {
     if (!isOpen || !action) {
       setStatus('loading');
@@ -36,6 +38,15 @@ export const ExecuteModal: React.FC<ExecuteModalProps> = ({
 
     executeAction();
   }, [isOpen, action]);
+
+  useEffect(() => {
+    if (status === 'success' && isOpenAction) {
+      const timer = setTimeout(() => {
+        onClose();
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [status, isOpenAction, onClose]);
 
   const executeAction = async () => {
     if (!action) return;
@@ -71,7 +82,6 @@ export const ExecuteModal: React.FC<ExecuteModalProps> = ({
 
   const isScript = action.action.type === 'execute_script';
   const isOther = action.action.type === 'other';
-  const isOpenAction = ['open_app', 'open_file', 'open_directory', 'open_url'].includes(action.action.type);
   
   const getLoadingMessage = () => {
     switch (action.action.type) {
