@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ArrowLeft, Sun, Moon, Monitor, HardDrive, RotateCcw, Info, Keyboard, Settings as SettingsIcon, ChevronRight, Cloud } from 'lucide-react';
 import { open } from '@tauri-apps/plugin-dialog';
+import { open as openUrl } from '@tauri-apps/plugin-shell';
 import { useSettingsStore } from '../stores/settingsStore';
 import type { SettingsTab, ThemeMode } from '../types/settings';
 
@@ -446,7 +447,7 @@ export const Settings: React.FC<SettingsProps> = ({ onBack }) => {
       <div className="about-header">
         <div className="app-logo">⚡</div>
         <h2 className="app-name">ClickPad</h2>
-        <p className="app-version">版本 1.0.0</p>
+        <p className="app-version">版本 1.0.2</p>
       </div>
 
       <div className="settings-group">
@@ -456,7 +457,7 @@ export const Settings: React.FC<SettingsProps> = ({ onBack }) => {
         </div>
         <div className="info-item">
           <span className="info-label">应用版本</span>
-          <span className="info-value">1.0.0</span>
+          <span className="info-value">1.0.2</span>
         </div>
         <div className="info-item">
           <span className="info-label">构建日期</span>
@@ -472,6 +473,13 @@ export const Settings: React.FC<SettingsProps> = ({ onBack }) => {
         <div className="group-title">更新日志</div>
         <div className="changelog">
           <div className="changelog-item">
+            <div className="changelog-version">v1.0.2</div>
+            <div className="changelog-content">
+              <p>• 全屏输出结果新增关闭按钮</p>
+              <p>• 更新 GitHub 仓库链接</p>
+            </div>
+          </div>
+          <div className="changelog-item" style={{ marginTop: '12px' }}>
             <div className="changelog-version">v1.0.0</div>
             <div className="changelog-content">
               <p>• 初始版本发布</p>
@@ -511,14 +519,14 @@ export const Settings: React.FC<SettingsProps> = ({ onBack }) => {
 
       <div className="settings-group">
         <div className="group-title">开源信息</div>
-        <div className="setting-item clickable">
+        <div className="setting-item clickable" onClick={() => openUrl('https://github.com/wu2kong/clickpad-app')}>
           <div className="setting-info">
             <span className="setting-label">GitHub</span>
             <span className="setting-description">查看源代码</span>
           </div>
           <ChevronRight size={16} className="chevron" />
         </div>
-        <div className="setting-item clickable">
+        <div className="setting-item clickable" onClick={() => openUrl('https://github.com/wu2kong/clickpad-app/issues')}>
           <div className="setting-info">
             <span className="setting-label">问题反馈</span>
             <span className="setting-description">报告问题或提出建议</span>

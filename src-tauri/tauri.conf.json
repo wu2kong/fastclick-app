@@ -1,7 +1,7 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/schema.json",
   "productName": "ClickPad",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "identifier": "com.clickpad.app",
   "build": {
     "beforeDevCommand": "npm run dev",
