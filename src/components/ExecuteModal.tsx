@@ -57,6 +57,7 @@ export const ExecuteModal: React.FC<ExecuteModalProps> = ({
         actionType: action.action.type,
         actionValue: action.action.value,
         params: action.action.params || null,
+        openWith: action.action.openWith || null,
       });
       setResult(res);
       setStatus(res.success ? 'success' : 'error');

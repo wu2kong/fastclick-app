@@ -19,6 +19,7 @@ export interface ClickAction {
     type: 'open_app' | 'open_file' | 'open_directory' | 'open_url' | 'execute_script' | 'other';
     value: string;
     params?: ScriptExecutionParams;
+    openWith?: string;
   };
   icon?: ActionIcon | null;
   categoryId: string;

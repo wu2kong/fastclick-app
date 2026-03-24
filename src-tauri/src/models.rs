@@ -63,6 +63,8 @@ pub struct ActionData {
     pub value: String,
     #[serde(default)]
     pub params: Option<ScriptParams>,
+    #[serde(default, rename = "openWith")]
+    pub open_with: Option<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

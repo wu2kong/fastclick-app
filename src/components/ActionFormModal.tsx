@@ -22,6 +22,7 @@ export const ActionFormModal: React.FC<ActionFormModalProps> = ({
     name: string;
     actionType: 'open_app' | 'open_file' | 'open_directory' | 'open_url' | 'execute_script' | 'other';
     actionValue: string;
+    openWith: string;
     iconType: 'emoji' | 'image';
     iconValue: string;
     categoryId: string;
@@ -34,6 +35,7 @@ export const ActionFormModal: React.FC<ActionFormModalProps> = ({
     name: '',
     actionType: 'open_app',
     actionValue: '',
+    openWith: '',
     iconType: 'emoji',
     iconValue: '',
     categoryId: categories[0]?.id || '',
@@ -44,6 +46,15 @@ export const ActionFormModal: React.FC<ActionFormModalProps> = ({
     displayInCLI: true,
   });
 
+  const openWithOptions = [
+    { value: '', label: '系统默认' },
+    { value: 'Trae CN', label: 'Trae CN' },
+    { value: 'Cursor', label: 'Cursor' },
+    { value: 'Visual Studio Code', label: 'Visual Studio Code' },
+    { value: 'Sublime Text', label: 'Sublime Text' },
+    { value: 'Typora', label: 'Typora' },
+  ];
+
   useEffect(() => {
     if (editAction) {
       const iconType = editAction.icon?.type || 'emoji';
@@ -52,6 +63,7 @@ export const ActionFormModal: React.FC<ActionFormModalProps> = ({
         name: editAction.name,
         actionType: editAction.action.type as any,
         actionValue: editAction.action.value,
+        openWith: editAction.action.openWith || '',
         iconType: iconType as 'emoji' | 'image',
         iconValue: iconValue,
         categoryId: editAction.categoryId,
@@ -66,6 +78,7 @@ export const ActionFormModal: React.FC<ActionFormModalProps> = ({
         name: '',
         actionType: 'open_app',
         actionValue: '',
+        openWith: '',
         iconType: 'emoji',
         iconValue: '',
         categoryId: categories[0]?.id || '',
@@ -90,6 +103,7 @@ export const ActionFormModal: React.FC<ActionFormModalProps> = ({
       action: {
         type: formData.actionType,
         value: formData.actionValue,
+        ...(['open_file', 'open_directory'].includes(formData.actionType) && formData.openWith ? { openWith: formData.openWith } : {}),
       },
       icon: icon,
       categoryId: formData.categoryId,
@@ -183,6 +197,21 @@ export const ActionFormModal: React.FC<ActionFormModalProps> = ({
               />
             </div>
           </div>
+
+          {['open_file', 'open_directory'].includes(formData.actionType) && (
+            <div className="form-group">
+              <label>打开方式（可选）</label>
+              <select
+                value={formData.openWith}
+                onChange={(e) => setFormData({ ...formData, openWith: e.target.value })}
+                style={{ height: '39px' }}
+              >
+                {openWithOptions.map((option) => (
+                  <option key={option.value} value={option.value}>{option.label}</option>
+                ))}
+              </select>
+            </div>
+          )}
 
           <div className="form-row">
             <div className="form-group">

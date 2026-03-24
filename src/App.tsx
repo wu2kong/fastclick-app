@@ -297,6 +297,13 @@ function App() {
         const tld = domain.substring(domain.lastIndexOf('.'));
         icon = { type: 'emoji', value: tldEmojiMap[tld] || '🔗' };
       }
+      console.log('urlObj', urlObj);
+      // 优化处理，处理首页和子目录
+      if (urlObj.pathname === "" || urlObj.pathname === "/") {
+        icon = { type: 'emoji', value: '🌐' };
+      } else {
+        icon = { type: 'emoji', value: '🔗' };
+      }
 
       const newAction = {
         name: capitalizedName,

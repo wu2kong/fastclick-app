@@ -12,12 +12,29 @@ pub async fn execute_action_by_id(app: &AppHandle, action_id: &str) -> Result<Ex
         .ok_or_else(|| format!("未找到操作: {}", action_id))?;
     
     match action.action_data.action_type.as_str() {
-        "open_app" | "open_directory" | "open_url" => {
+        "open_app" | "open_url" => {
             execute_open_app(&action.action_data.value, None, app).await
         }
-        "open_file" => {
-            let settings = crate::config::load_settings();
-            let editor = get_editor_for_file(&action.action_data.value, &settings);
+        "open_file" | "open_directory" => {
+            let editor = if let Some(ref open_with) = action.action_data.open_with {
+                if open_with.is_empty() {
+                    if action.action_data.action_type == "open_file" {
+                        let settings = crate::config::load_settings();
+                        get_editor_for_file(&action.action_data.value, &settings)
+                    } else {
+                        None
+                    }
+                } else {
+                    Some(open_with.clone())
+                }
+            } else {
+                if action.action_data.action_type == "open_file" {
+                    let settings = crate::config::load_settings();
+                    get_editor_for_file(&action.action_data.value, &settings)
+                } else {
+                    None
+                }
+            };
             execute_open_app(&action.action_data.value, editor.as_deref(), app).await
         }
         "execute_script" => {
@@ -66,15 +83,33 @@ pub async fn execute_action(
     action_type: String,
     action_value: String,
     params: Option<ScriptParams>,
+    open_with: Option<String>,
     app: AppHandle,
 ) -> Result<ExecuteResult, String> {
     match action_type.as_str() {
-        "open_app" | "open_directory" | "open_url" => {
+        "open_app" | "open_url" => {
             execute_open_app(&action_value, None, &app).await
         }
-        "open_file" => {
-            let settings = crate::config::load_settings();
-            let editor = get_editor_for_file(&action_value, &settings);
+        "open_file" | "open_directory" => {
+            let editor = if let Some(ref open_with_val) = open_with {
+                if open_with_val.is_empty() {
+                    if action_type == "open_file" {
+                        let settings = crate::config::load_settings();
+                        get_editor_for_file(&action_value, &settings)
+                    } else {
+                        None
+                    }
+                } else {
+                    Some(open_with_val.clone())
+                }
+            } else {
+                if action_type == "open_file" {
+                    let settings = crate::config::load_settings();
+                    get_editor_for_file(&action_value, &settings)
+                } else {
+                    None
+                }
+            };
             execute_open_app(&action_value, editor.as_deref(), &app).await
         }
         "execute_script" => execute_script(&action_value, params, &app).await,
